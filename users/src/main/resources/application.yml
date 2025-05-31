@@ -1,0 +1,75 @@
+server:
+  port: 8080
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:7080/realms/master
+  application:
+    name: "users"
+  profiles:
+    active: "prod"
+  config:
+    import:
+      - "configserver:http://configserver:8071/"
+#  config:
+#    import:
+#      - "configserver:http://localhost:8071/"
+  datasource:
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password: ''
+    driver-class-name: org.h2.Driver
+  h2:
+    console:
+      enabled: true
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    shutdown:
+      access: unrestricted
+  info:
+    env:
+      enabled: true
+
+endpoints:
+  shutdown:
+    enabled: true
+
+
+grpc:
+  server:
+    port: 9091
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    fetchRegistry: true
+    registerWithEureka: true
+    serviceUrl:
+      defaultZone: http://eurekaserver:8070/eureka/
+
+keycloak:
+  server-url: http://localhost:7080
+  realm: master
+  client-id: agrichain-gateway-cc
+  client-secret: EO3hirhVzqaP6E3afvOzYaK285F1YH4C
+
+
+
+info:
+  app:
+    name: "accounts"
+    description: "AgriChain Invest Users microservice application"
+    version: "1.0.0"

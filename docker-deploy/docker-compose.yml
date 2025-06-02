@@ -139,7 +139,7 @@ services:
 
   nginx:
     image: nginx:alpine
-    container_name: nginx-keycloak
+    container_name: nginx
     ports:
       - "8050:8050"
     volumes:

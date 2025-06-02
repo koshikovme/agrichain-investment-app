@@ -1,11 +1,11 @@
 server:
-  port: 8080
+  port: 8060
 spring:
   security:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:7080/realms/master
+          issuer-uri: http://keycloak:8080/realms/master
   application:
     name: "users"
   profiles:
@@ -61,7 +61,7 @@ eureka:
       defaultZone: http://eurekaserver:8070/eureka/
 
 keycloak:
-  server-url: http://localhost:7080
+  server-url: http://keycloak:8080
   realm: master
   client-id: agrichain-gateway-cc
   client-secret: EO3hirhVzqaP6E3afvOzYaK285F1YH4C

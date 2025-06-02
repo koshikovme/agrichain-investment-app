@@ -25,7 +25,7 @@ spring:
       resourceserver:
         jwt:
 #          jwk-set-uri: "http://localhost:7080/realms/master/protocol/openid-connect/certs"
-          issuer-uri: "http://192.168.10.6:7080/realms/master"
+          issuer-uri: http://keycloak:8080/realms/master
 
 
 #

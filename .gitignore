@@ -6,3 +6,4 @@ target/
 *.jar
 application.properties
 .env
+notification-service/config/config.yaml

@@ -118,6 +118,19 @@ public class InvestmentsServiceImpl implements InvestmentsService {
         Payment.PaymentResponse  paymentResponse = paymentGrpcClient.createPayment(createPaymentRequest);
 
         if (paymentResponse != null && paymentResponse.getErrorCode().isEmpty()) {
+            Payment.ExecutePaymentRequest executePaymentRequest = Payment.ExecutePaymentRequest.newBuilder()
+                    .setPaymentId(paymentResponse.getPaymentId())
+                    .setPayerId(paymentResponse.getPayerId())
+                    .build();
+
+            Payment.PaymentResponse executePayment = paymentGrpcClient.executePayment(executePaymentRequest);
+            if (executePayment.getStatus().equals("completed")) {
+                targetInvestment.setInvestmentStatus(InvestmentStatus.INVESTED);
+                updateInvestment(targetInvestment);
+            } else {
+                throw new RuntimeException("Payment execution failed: " + executePayment.getErrorMessage());
+            }
+
             targetInvestment.setInvestmentStatus(InvestmentStatus.INVESTED);
             updateInvestment(targetInvestment);
         }

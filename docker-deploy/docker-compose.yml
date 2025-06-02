@@ -1,0 +1,151 @@
+services:
+
+  gatewayserver:
+    image: gatewayserver:latest
+    build:
+      context: ../gatewayserver
+    container_name: gatewayserver-ms
+    ports:
+      - "8072:8072"
+    depends_on:
+      users:
+        condition: service_healthy
+      investments:
+        condition: service_healthy
+    environment:
+      SPRING_APPLICATION_NAME: "gatewayserver"
+    extends:
+      file: common-config.yml
+      service: microservice-eureka-config
+    networks:
+      - agrichain
+
+  configserver:
+    image: configserver:latest
+    build:
+      context: ../configserver
+    container_name: configserver-ms
+    ports:
+      - "8071:8071"
+    healthcheck:
+      test: "curl --fail --silent localhost:8071/actuator/health/readiness | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    extends:
+      file: common-config.yml
+      service: microservice-base-config
+    networks:
+      - agrichain
+
+  eurekaserver:
+    image: eurekaserver:latest
+    build:
+      context: ../eurekaserver
+    container_name: eurekaserver-ms
+    ports:
+      - "8070:8070"
+    healthcheck:
+      test: "curl --fail --silent localhost:8070/actuator/health/readiness | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    extends:
+      file: common-config.yml
+      service: microservice-configserver-config
+    depends_on:
+      configserver:
+        condition: service_healthy
+    environment:
+      SPRING_APPLICATION_NAME: "eurekaserver"
+    networks:
+      - agrichain
+
+  users:
+    image: users:latest
+    build:
+      context: ../users
+    container_name: users-ms
+    ports:
+      - "8060:8060"
+    healthcheck:
+      test: "curl --fail --silent localhost:8080/actuator/health/readiness | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    depends_on:
+      configserver:
+        condition: service_healthy
+    environment:
+      SPRING_APPLICATION_NAME: "users"
+    extends:
+      file: common-config.yml
+      service: microservice-eureka-config
+    networks:
+      - agrichain
+
+  investments:
+    image: investments:latest
+    build:
+      context: ../investments
+    container_name: investments-ms
+    ports:
+      - "8090:8090"
+    healthcheck:
+      test: "curl --fail --silent localhost:8090/actuator/health/readiness | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    depends_on:
+      configserver:
+        condition: service_healthy
+    environment:
+      SPRING_APPLICATION_NAME: "investments"
+    extends:
+      file: common-config.yml
+      service: microservice-eureka-config
+    networks:
+      - agrichain
+
+  keycloak:
+    image: koshikov1/agrichain-keycloak:latest
+    container_name: keycloak
+    ports:
+      - "8080:8080"
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    command:
+      - start-dev
+      - --hostname=keycloak
+      - --hostname-strict=false
+    extends:
+      file: common-config.yml
+      service: microservice-base-config
+    networks:
+      - agrichain
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - gatewayserver
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - REACT_APP_KEYCLOAK_URL=http://keycloak:8080
+      - REACT_APP_GATEWAY_USERS_URL=http://localhost:8072/agrichain/users
+      - REACT_APP_GATEWAY_INVESTMENTS_URL=http://localhost:8072/agrichain/investments
+    networks:
+      - agrichain
+
+networks:
+  agrichain:
+    driver: "bridge"

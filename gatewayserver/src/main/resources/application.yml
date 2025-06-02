@@ -4,9 +4,6 @@ spring:
   config:
     import:
       - "configserver:http://configserver:8071/"
-#  config:
-#    import:
-#      - "optional:configserver:http://localhost:8071/"
   cloud:
     gateway:
       httpclient:
@@ -24,11 +21,9 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-#          jwk-set-uri: "http://localhost:7080/realms/master/protocol/openid-connect/certs"
           issuer-uri: http://keycloak:8080/realms/master
 
 
-#
 management:
   endpoints:
     web:

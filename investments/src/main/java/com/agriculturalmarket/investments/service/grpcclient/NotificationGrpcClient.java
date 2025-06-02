@@ -13,7 +13,7 @@ public class NotificationGrpcClient {
 
     public NotificationGrpcClient() {
         ManagedChannel channel = ManagedChannelBuilder
-                .forAddress("localhost", 8081)
+                .forAddress("notification-service", 8081)
                 .usePlaintext()
                 .build();
 

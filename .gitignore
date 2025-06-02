@@ -3,7 +3,5 @@ target/
 *.class
 .idea/
 *.iml
-*.jar
 application.properties
 .env
-notification-service/config/config.yaml

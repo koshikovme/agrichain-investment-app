@@ -51,8 +51,6 @@ public class SecurityConfig {
         corsConfig.setAllowCredentials(true);
 
         corsConfig.addAllowedOrigin("http://localhost:3000");
-        corsConfig.addAllowedOrigin("https://subtly-fun-eel.ngrok-free.app");
-
         corsConfig.addAllowedHeader("*");
         corsConfig.addAllowedMethod("*");
 

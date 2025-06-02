@@ -1,0 +1,21 @@
+database:
+  host: "postgres"
+  user: "postgres"
+  password: "root"
+  dbname: "postgres"
+  port: 5432
+  sslmode: "disable"
+
+smtp:
+  sender_email: "Support@AgriChain.kz"
+  username: "a6da0c2bc98633"
+  password: "3f757474b9786c"
+
+kafka:
+  topic: "notifications"
+
+ports:
+  http: 8081
+  grpc: 50000
+  ws: 6969
+  kafka: ["kafka:9092"]

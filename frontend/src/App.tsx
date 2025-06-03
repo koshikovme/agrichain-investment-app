@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/UI/navbar/Navbar";
+import Footer from "./components/UI/footer/Footer";
 import PersonalPage from "./pages/PersonalPage";
 import InvestmentsPage from "./pages/InvestmentsPage";
 import TransactionsPage from "./pages/TransactionsPage";
@@ -40,6 +41,7 @@ const App = () => {
                                     }
                                 />
                             </Routes>
+                        <Footer />
                         </div>
                     </Router>
                 </WalletModalProvider>

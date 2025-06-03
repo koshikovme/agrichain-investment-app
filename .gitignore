@@ -5,3 +5,5 @@ target/
 *.iml
 application.properties
 .env
+docker-compose.keycloak.yml
+node_modules/

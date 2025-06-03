@@ -45,9 +45,13 @@ const MainPage: React.FC = () => (
                 px: 3,
             }}
         >
-            <AgricultureIcon sx={{ fontSize: 70, color: "#4caf50", mb: 2 }} />
+            <img
+                src="/images/agrichain_logo_no_text.svg"
+                alt="AgriChain Logo"
+                style={{ width: 80, marginBottom: 20 }}
+            />
             <Typography
-                variant="h2"
+                variant="h4"
                 fontWeight={700}
                 sx={{
                     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
@@ -59,7 +63,7 @@ const MainPage: React.FC = () => (
                 AgriChain — инвестиции в сельское хозяйство на блокчейне
             </Typography>
             <Typography
-                variant="h5"
+                variant="h6"
                 sx={{
                     color: "#616161",
                     mb: 4,
@@ -92,7 +96,7 @@ const MainPage: React.FC = () => (
         </Box>
 
         {/* Features */}
-        <Box sx={{ maxWidth: 1200, mx: "auto", mt: 7, px: 2 }}>
+        <Box sx={{ maxWidth: 1800, mx: "auto", mt: 7, px: 2 }}>
             <Grid container spacing={4} justifyContent="center">
                 {features.map((f, i) => (
                     <Grid key={i}>
@@ -101,9 +105,10 @@ const MainPage: React.FC = () => (
                                 borderRadius: 4,
                                 boxShadow: 2,
                                 textAlign: "center",
-                                py: 4,
+                                py: 2,
                                 px: 2,
-                                minHeight: 220,
+                                height: 200,
+                                width: 350,
                                 transition: "box-shadow 0.2s",
                                 "&:hover": { boxShadow: 6 },
                                 background: "linear-gradient(135deg, #f1f8e9 60%, #fffde7 100%)",

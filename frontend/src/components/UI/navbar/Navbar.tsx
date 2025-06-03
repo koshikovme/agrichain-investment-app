@@ -27,7 +27,11 @@ const Navbar = () => {
         >
             <Toolbar sx={{ px: 2 }}>
                 <Typography variant="h6" sx={{ flexGrow: 1, display: "flex", alignItems: "center" }}>
-                    <AgricultureIcon sx={{ color: "#4caf50", fontSize: 38, mr: 1 }} />
+                    <img
+                        src="/images/agrichain_logo_no_text.svg"
+                        alt="AgriChain Logo"
+                        style={{ width: 28, marginRight: 8 }}
+                    />
                     <Button
                         color="inherit"
                         component={Link}

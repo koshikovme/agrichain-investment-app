@@ -5,14 +5,14 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://keycloak:8080/realms/master
+          issuer-uri: http://localhost:8080/realms/master
   application:
     name: "users"
   profiles:
     active: "prod"
   config:
     import:
-      - "configserver:http://configserver:8071/"
+      - "configserver:http://localhost:8071/"
 #  config:
 #    import:
 #      - "configserver:http://localhost:8071/"

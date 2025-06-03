@@ -3,7 +3,7 @@ spring:
     name: "eurekaserver"
   config:
     import:
-      - "configserver:http://configserver:8071/"
+      - "configserver:http://localhost:8071/"
 #  config:
 #    import:
 #      - "optional:configserver:http://localhost:8071/"

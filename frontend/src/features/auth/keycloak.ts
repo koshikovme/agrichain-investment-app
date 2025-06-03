@@ -6,7 +6,8 @@ import {unwrapResult} from "@reduxjs/toolkit";
 
 // @ts-ignore
 const keycloak = new Keycloak({
-    url: process.env.REACT_APP_KEYCLOAK_URL || 'http://localhost:8080',
+    // url: process.env.REACT_APP_KEYCLOAK_URL || 'http://localhost:8080',
+    url: 'http://keycloak:8080',
     realm: 'master',
     clientId: 'agrichain-client-ac',
 });

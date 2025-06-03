@@ -17,8 +17,6 @@ services:
     extends:
       file: common-config.yml
       service: microservice-eureka-config
-    networks:
-      - agrichain
 
   configserver:
     image: configserver:latest
@@ -37,8 +35,6 @@ services:
     extends:
       file: common-config.yml
       service: microservice-base-config
-    networks:
-      - agrichain
 
   eurekaserver:
     image: eurekaserver:latest
@@ -62,8 +58,6 @@ services:
     restart: unless-stopped
     environment:
       SPRING_APPLICATION_NAME: "eurekaserver"
-    networks:
-      - agrichain
 
   users:
     image: users:latest
@@ -89,8 +83,6 @@ services:
     extends:
       file: common-config.yml
       service: microservice-eureka-config
-    networks:
-      - agrichain
 
   investments:
     image: investments:latest
@@ -116,8 +108,6 @@ services:
     extends:
       file: common-config.yml
       service: microservice-eureka-config
-    networks:
-      - agrichain
 
   keycloak:
     image: koshikov1/agrichain-keycloak:latest
@@ -131,23 +121,23 @@ services:
       - start-dev
       - --hostname=keycloak
       - --hostname-strict=false
+    restart: unless-stopped
     extends:
       file: common-config.yml
       service: microservice-base-config
-    networks:
-      - agrichain
 
-  nginx:
-    image: nginx:alpine
-    container_name: nginx
-    ports:
-      - "8050:8050"
-    volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
-    depends_on:
-      - keycloak
-    networks:
-      - agrichain
+#  nginx:
+#    image: nginx:alpine
+#    container_name: nginx
+#    ports:
+#      - "8050:8050"
+#    volumes:
+#      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+#    depends_on:
+#      - keycloak
+#    restart: unless-stopped
+#    networks:
+#      - agrichain
 
   frontend:
     build:
@@ -163,8 +153,10 @@ services:
       - REACT_APP_KEYCLOAK_URL=http://keycloak:8080
       - REACT_APP_GATEWAY_USERS_URL=http://localhost:8072/agrichain/users
       - REACT_APP_GATEWAY_INVESTMENTS_URL=http://localhost:8072/agrichain/investments
-    networks:
-      - agrichain
+    restart: unless-stopped
+    extends:
+      file: common-config.yml
+      service: microservice-base-config
 
 
   notification-service:
@@ -184,8 +176,9 @@ services:
     volumes:
       - ../notification-service/config:/app/config
       - ../notification-service/pkg/email:/app/pkg/email
-    networks:
-      - agrichain
+    extends:
+      file: common-config.yml
+      service: microservice-base-config
 
   kafka:
       image: bitnami/kafka:3.7
@@ -204,8 +197,9 @@ services:
         - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
         - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=INTERNAL
         - ALLOW_PLAINTEXT_LISTENER=yes
-      networks:
-        - agrichain
+      extends:
+        file: common-config.yml
+        service: microservice-base-config
 
 
   postgres:
@@ -219,8 +213,9 @@ services:
         - "5433:5432"
       volumes:
         - pgdata:/var/lib/postgresql/data
-      networks:
-        - agrichain
+      extends:
+        file: common-config.yml
+        service: microservice-base-config
 
   migrate:
       image: migrate/migrate
@@ -260,8 +255,9 @@ services:
       - mongo
       - ts-api
     restart: unless-stopped
-    networks:
-      - agrichain
+    extends:
+      file: common-config.yml
+      service: microservice-base-config
 
   ts-api:
     build:
@@ -272,8 +268,9 @@ services:
     environment:
       - NODE_ENV=production
     restart: unless-stopped
-    networks:
-      - agrichain
+    extends:
+      file: common-config.yml
+      service: microservice-base-config
 
   mongo:
     image: mongo:6.0
@@ -282,8 +279,9 @@ services:
     volumes:
       - mongo-data:/data/db
     restart: unless-stopped
-    networks:
-      - agrichain
+    extends:
+      file: common-config.yml
+      service: microservice-base-config
 
 
 volumes:

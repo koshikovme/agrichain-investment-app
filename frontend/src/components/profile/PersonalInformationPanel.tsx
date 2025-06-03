@@ -1,4 +1,5 @@
 import React, { FC, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
     Box,
     Typography,
@@ -18,6 +19,7 @@ import UpdateProfileModal from "../UI/modal/UpdateProfileModal";
 import {useUserWebSocket} from "../../features/user/useUsersWebSocket";
 
 const PersonalInformationPanel: FC = () => {
+    const navigate = useNavigate();
     const [modalOpen, setModalOpen] = useState(false);
     const dispatch = useAppDispatch();
     const { userInfo, isLoading, error } = useAppSelector((state) => state.reducer.user);
@@ -48,8 +50,10 @@ const PersonalInformationPanel: FC = () => {
     }
 
     if (!userInfo.name) {
-        return <Typography textAlign="center" mt={4}>No user data found.</Typography>;
+        navigate("/");
+        return null;
     }
+
 
     return (
         <Box

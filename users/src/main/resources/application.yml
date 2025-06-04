@@ -58,10 +58,10 @@ eureka:
     fetchRegistry: true
     registerWithEureka: true
     serviceUrl:
-      defaultZone: http://eurekaserver:8070/eureka/
+      defaultZone: http://localhost:8070/eureka/
 
 keycloak:
-  server-url: http://keycloak:8080
+  server-url: http://localhost:8080
   realm: master
   client-id: agrichain-gateway-cc
   client-secret: EO3hirhVzqaP6E3afvOzYaK285F1YH4C

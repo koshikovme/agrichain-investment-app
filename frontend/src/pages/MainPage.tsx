@@ -8,6 +8,7 @@ import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
 import HeroSection from '../components/UI/hero/HeroSection';
 import Reviews from '../components/UI/reviews/Reviews'
 import HowItWorks from '../components/UI/howItWorks/HowItWorks'
+import FAQ from '../components/UI/faq/faq'
 
 const features = [
     {
@@ -161,6 +162,9 @@ const MainPage: React.FC = () => (
         <Reviews />
         {/** How it works */}
         <HowItWorks />
+        {/** FAQ */}
+        <FAQ />
+
     </Box>
 
 

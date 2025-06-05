@@ -6,7 +6,7 @@ const Footer = () => (
     component="footer"
     sx={{
       py: { xs: 4, md: 6 },
-      px: { xs: 2, md: 8 },
+      px: { xs: 1, md: 3 },
       background: "linear-gradient(90deg, #e8f5e9 0%, #fffde7 100%)",
       borderTop: "1px solid #c8e6c9",
       fontFamily: "'Gothic A1', Arial, sans-serif",

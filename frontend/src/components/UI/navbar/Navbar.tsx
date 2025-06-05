@@ -13,14 +13,18 @@ import {
     Box,
     useTheme,
     useMediaQuery,
+    Badge,
+    Popover,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import CloseIcon from "@mui/icons-material/Close";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../../app/store";
 import { keycloak } from "../../../features/auth/keycloak";
 import { logout as logoutAction } from "../../../features/auth/authSlice";
-import { useNotificationWebSocket } from "../../../features/notification/useNotificationWebSocket";
+import { useNotificationWebSocket, WebNotification } from "../../../features/notification/useNotificationWebSocket";
 import AgricultureIcon from "@mui/icons-material/Agriculture";
 
 const Navbar = () => {
@@ -29,14 +33,30 @@ const Navbar = () => {
     const isAuthenticated = useSelector((state: RootState) => state.reducer.auth.isAuthenticated);
     const user = useSelector((state: RootState) => state.reducer.user);
 
-    useNotificationWebSocket(user.userInfo.accountsDto.accountNumber);
+    const {
+        notifications,
+        open: notifOpen,
+        setOpen: setNotifOpen,
+        markAsRead,
+    } = useNotificationWebSocket(user.userInfo.accountsDto.accountNumber);
 
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
     const [drawerOpen, setDrawerOpen] = React.useState(false);
+    const [notifAnchor, setNotifAnchor] = React.useState<null | HTMLElement>(null);
 
     const handleDrawerToggle = () => setDrawerOpen((prev) => !prev);
+
+    const handleNotifClick = (event: React.MouseEvent<HTMLElement>) => {
+        setNotifAnchor(event.currentTarget);
+        setNotifOpen(true);
+    };
+
+    const handleNotifClose = () => {
+        setNotifAnchor(null);
+        setNotifOpen(false);
+    };
 
     const navItems = [
         {
@@ -124,6 +144,83 @@ const Navbar = () => {
                         AgriChain
                     </Button>
                 </Typography>
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                    {isAuthenticated && user.userInfo?.accountsDto?.accountNumber && (
+                        <>
+                            <IconButton
+                                color="inherit"
+                                onClick={handleNotifClick}
+                                sx={{ mr: 1, color: "#2e7d32", position: "relative" }}
+                            >
+                                <Badge
+                                    color="error"
+                                    variant="dot"
+                                    invisible={notifications.length === 0}
+                                    overlap="circular"
+                                    anchorOrigin={{ vertical: "top", horizontal: "right" }}
+                                >
+                                    <NotificationsIcon fontSize="large" />
+                                </Badge>
+                            </IconButton>
+                            <Popover
+                                open={notifOpen && Boolean(notifAnchor)}
+                                anchorEl={notifAnchor}
+                                onClose={handleNotifClose}
+                                anchorOrigin={{
+                                    vertical: "bottom",
+                                    horizontal: "right",
+                                }}
+                                transformOrigin={{
+                                    vertical: "top",
+                                    horizontal: "right",
+                                }}
+                                PaperProps={{
+                                    sx: { minWidth: 320, maxWidth: 400, p: 2, borderRadius: 3 },
+                                }}
+                            >
+                                <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
+                                    <Typography variant="h6" sx={{ color: "#2e7d32" }}>Уведомления</Typography>
+                                    <IconButton size="small" onClick={handleNotifClose}>
+                                        <CloseIcon />
+                                    </IconButton>
+                                </Box>
+                                {notifications.length === 0 ? (
+                                    <Typography variant="body2" sx={{ color: "#888" }}>Нет новых уведомлений</Typography>
+                                ) : (
+                                    notifications.map((notif: WebNotification) => (
+                                        <Box
+                                            key={notif.id}
+                                            sx={{
+                                                mb: 2,
+                                                p: 1.5,
+                                                borderRadius: 2,
+                                                background: "#f1f8e9",
+                                                boxShadow: "0 1px 4px 0 rgba(76,175,80,0.08)",
+                                            }}
+                                        >
+                                            <Typography variant="subtitle1" sx={{ fontWeight: 600, color: "#388e3c" }}>
+                                                {notif.subject}
+                                            </Typography>
+                                            <Typography
+                                                variant="body2"
+                                                sx={{ color: "#333", mt: 0.5, whiteSpace: "pre-line" }}
+                                                dangerouslySetInnerHTML={{ __html: notif.body.replace(/\n/g, "<br />") }}
+                                            />
+                                            <Button
+                                                size="small"
+                                                variant="outlined"
+                                                sx={{ mt: 1, color: "#2e7d32", borderColor: "#2e7d32" }}
+                                                onClick={() => markAsRead(notif.id)}
+                                            >
+                                                Прочитано
+                                            </Button>
+                                        </Box>
+                                    ))
+                                )}
+                            </Popover>
+                        </>
+                    )}
+                </Box>
                 {isMobile ? (
                     <>
                         <IconButton
@@ -170,7 +267,7 @@ const Navbar = () => {
                                                 >
                                                     <ListItemText
                                                         primary={item.label}
-                                                        primaryTypographyProps={{ fontWeight: "bold" }} // Сделать жирным
+                                                        primaryTypographyProps={{ fontWeight: "bold" }}
                                                     />
                                                 </ListItemButton>
                                             </ListItem>
@@ -186,7 +283,7 @@ const Navbar = () => {
                                                 >
                                                     <ListItemText
                                                         primary={item.label}
-                                                        primaryTypographyProps={{ fontWeight: "bold" }} // Сделать жирным
+                                                        primaryTypographyProps={{ fontWeight: "bold" }}
                                                     />
                                                 </ListItemButton>
                                             </ListItem>
@@ -204,7 +301,7 @@ const Navbar = () => {
                                             >
                                                 <ListItemText
                                                     primary={item.label}
-                                                    primaryTypographyProps={{ fontWeight: "bold" }} // Сделать жирным
+                                                    primaryTypographyProps={{ fontWeight: "bold" }}
                                                 />
                                             </ListItemButton>
                                         </ListItem>
@@ -231,7 +328,7 @@ const Navbar = () => {
                                         py: 1,
                                         fontFamily:
                                             '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-                                        color: "#2e7d32", // changed color
+                                        color: "#2e7d32",
                                         "&:hover": { background: "rgba(46,125,50,0.08)" },
                                     }}
                                 >
@@ -250,7 +347,7 @@ const Navbar = () => {
                                         py: 1,
                                         fontFamily:
                                             '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-                                        color: "#2e7d32", // changed color
+                                        color: "#2e7d32",
                                         "&:hover": { background: "rgba(46,125,50,0.08)" },
                                     }}
                                     onClick={item.onClick}
@@ -272,7 +369,7 @@ const Navbar = () => {
                                     py: 1,
                                     fontFamily:
                                         '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-                                    color: "#2e7d32", // changed color
+                                    color: "#2e7d32",
                                     "&:hover": { background: "rgba(46,125,50,0.08)" },
                                 }}
                                 onClick={item.onClick}

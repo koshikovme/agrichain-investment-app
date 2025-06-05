@@ -15,13 +15,14 @@ import {
 } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material/Select';
 import {useNotificationWebSocket} from "../features/notification/useNotificationWebSocket";
+import { WebNotification } from "../features/notification/useNotificationWebSocket";
 
 const appleFont = `"SF Pro Display","SF Pro Icons","Helvetica Neue","Helvetica","Arial",sans-serif`;
 
 const CreateInvestmentForm = () => {
     const dispatch = useAppDispatch();
     const { userInfo } = useAppSelector((state) => state.reducer.user);
-    const { open, notification, handleClose } = useNotificationWebSocket(userInfo.accountsDto.accountNumber);
+    const { notifications, open, setOpen } = useNotificationWebSocket(userInfo.accountsDto.accountNumber);
 
 
     const [form, setForm] = useState<Partial<InvestmentsDto>>({
@@ -170,16 +171,16 @@ const CreateInvestmentForm = () => {
                 </Button>
             </Box>
         </Paper>
-          <Snackbar
-              open={open}
-              autoHideDuration={6000}
-              onClose={handleClose}
-              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-          >
-              <Alert onClose={handleClose} severity="info" sx={{ width: '100%' }}>
-                  <div dangerouslySetInnerHTML={{ __html: notification || '' }} />
-              </Alert>
-          </Snackbar>
+            <Snackbar
+                open={open && notifications.length > 0}
+                autoHideDuration={6000}
+                onClose={() => setOpen(false)}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            >
+                <Alert onClose={() => setOpen(false)} severity="info" sx={{ width: '100%' }}>
+                    <div dangerouslySetInnerHTML={{ __html: notifications[0]?.subject + "<br/><br/>" + (notifications[0]?.body || "") }} />
+                </Alert>
+            </Snackbar>
       </>
     );
 };

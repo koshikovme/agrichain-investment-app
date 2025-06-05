@@ -1,7 +1,7 @@
 import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit';
 import axios from "axios";
 
-const API_URL = 'http://gatewayserver:8072/agrichain/users'
+const API_URL = 'http://localhost:8072/agrichain/users'
 
 
 interface User {

@@ -11,7 +11,7 @@ import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
 import "@solana/wallet-adapter-react-ui/styles.css";
 import MainPage from "./pages/MainPage";
 import SolanaPayLinkGenerator from "./features/solana/SolanaPayLinkGenerator";
-
+import './index.css'; 
 const ENDPOINT = "https://api.devnet.solana.com";
 
 const App = () => {

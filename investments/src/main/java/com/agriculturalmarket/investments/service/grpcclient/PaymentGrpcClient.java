@@ -13,7 +13,7 @@ public class PaymentGrpcClient {
 
     public PaymentGrpcClient() {
         ManagedChannel channel = ManagedChannelBuilder
-                .forAddress("payment-api", 50051)
+                .forAddress("localhost", 50051)
                 .usePlaintext()
                 .build();
 

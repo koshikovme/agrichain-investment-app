@@ -1,0 +1,178 @@
+{
+  "main": {
+    "title": "AgriChain — blockchain-based agricultural investments",
+    "subtitle": "Transparent and secure investments in the agricultural sector. Use blockchain opportunities to grow your capital and support farmers.",
+    "cta": "Start investing",
+    "features": {
+      "blockchain": "Blockchain Transparency",
+      "blockchainDesc": "All investments and transactions are protected and verifiable.",
+      "security": "Funds Security",
+      "securityDesc": "Your assets are securely protected by modern technologies.",
+      "fast": "Fast Payouts",
+      "fastDesc": "Instant transfers and investments without delays.",
+      "profit": "Profitable Investments",
+      "profitDesc": "Invest in agriculture and receive stable income."
+    }
+  },
+  "navbar": {
+  "profile": "Profile",
+  "investments": "Investments",
+  "transactions": "Transactions",
+  "logout": "Logout",
+  "login": "Login",
+  "register": "Register",
+  "notifications": "Notifications",
+  "noNotifications": "No new notifications",
+  "markAsRead": "Mark as read"
+},
+  "hero": {
+    "title": "AgriChain — your path to innovative investments in agribusiness",
+    "subtitle": "Unlock new opportunities for capital growth and farmer support with digital technologies.",
+    "cta": "Invest now",
+    "features": [
+      {
+        "icon": "🌱",
+        "title": "Invest in real agribusiness",
+        "desc": "Support farming projects and develop agriculture together with us."
+      },
+      {
+        "icon": "🔗",
+        "title": "Digital assets and transparency",
+        "desc": "All information about your investments is available online and protected by blockchain."
+      },
+      {
+        "icon": "🚀",
+        "title": "Modern tools",
+        "desc": "Manage your investments via a convenient platform and receive fast payouts."
+      },
+      {
+        "icon": "🤝",
+        "title": "Community and trust",
+        "desc": "Join a community of investors and farmers for mutual growth."
+      }
+    ]
+  },
+  "reviews": {
+    "title": "Reviews about AgriChain platform",
+    "subtitle": "More than 2,000 investors are already with us",
+    "items": [
+      {
+        "name": "Elon Musk",
+        "role": "Entrepreneur, inventor",
+        "avatar": "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcQU2JRbbl3LBOm_an3eI5iplFhOoLESyBwUfmWDO49BS1EYuGUE",
+        "text": "“AgriChain is the future of agriculture. Blockchain transparency and farmer support are exactly what is needed for sustainable development of the planet!”",
+        "stars": 5
+      },
+      {
+        "name": "Ricardo Milos",
+        "role": "Investor, blockchain enthusiast",
+        "avatar": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQgummKJ_A8DlzM3VmTd6sEHYuYYFZchEB8rA&s",
+        "text": "“I invested in AgriChain and have no regrets! Everything is simple, fast, and secure. I support farmers and receive stable income!”",
+        "stars": 5
+      },
+      {
+        "name": "Kassym-Jomart Tokayev",
+        "role": "President of the Republic of Kazakhstan",
+        "avatar": "https://cs14.pikabu.ru/post_img/big/2022/10/20/8/1666272350235290522.png",
+        "text": "“AgriChain is a great example of innovation in Kazakhstan's agricultural sector. Transparent investments help develop agriculture and support our farmers.”",
+        "stars": 5
+      }
+    ]
+  },
+  "howItWorks": {
+    "title": "How does AgriChain work?",
+    "subtitle": "The platform connects investors and farmers for transparent and profitable investments in the agricultural sector.",
+    "investorTitle": "Investor's path",
+    "farmerTitle": "Farmer's path",
+    "investorSteps": [
+      { "icon": "📝", "title": "Create an account", "desc": "Register as an investor on the AgriChain platform." },
+      { "icon": "📢", "title": "Publish a lot", "desc": "Create an application specifying what you are ready to invest in." },
+      { "icon": "🏆", "title": "Auction", "desc": "Farmers apply, you select the best candidates." },
+      { "icon": "🤝", "title": "Contract", "desc": "Sign a smart contract with the selected farmer." },
+      { "icon": "💸", "title": "Receive dividends", "desc": "Get income from successful projects." }
+    ],
+    "farmerSteps": [
+      { "icon": "📝", "title": "Create an account", "desc": "Register as a farmer on the AgriChain platform." },
+      { "icon": "🌱", "title": "Apply for a lot", "desc": "Choose a lot and offer your candidacy." },
+      { "icon": "📊", "title": "Results", "desc": "Find out the auction results and get feedback." },
+      { "icon": "🤝", "title": "Contract", "desc": "Sign a smart contract with the investor." },
+      { "icon": "🚜", "title": "Receive investments", "desc": "Get funds and develop your enterprise." },
+      { "icon": "💵", "title": "Pay dividends", "desc": "Pay dividends to the investor after the project is completed." }
+    ]
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Everything you wanted to know about the AgriChain platform",
+    "items": [
+      {
+        "question": "How does payment work?",
+        "answer": "<b>AgriChain</b> supports payments via <b>PayPal</b> and <b>Solana Pay</b>. Choose your preferred method when investing in projects."
+      },
+      {
+        "question": "How to invest in agro-projects?",
+        "answer": "Go to the <b>Investments</b> section, select a lot you are interested in and click <b>Invest</b>. Choose a payment method: PayPal or Solana Pay."
+      },
+      {
+        "question": "How can a farmer post an investment lot?",
+        "answer": "After registering as a farmer, fill out the <b>Create Investment Lot</b> form on the investments page. Specify the amount, type, and description of the project."
+      },
+      {
+        "question": "Are my funds safe?",
+        "answer": "All transactions go through the blockchain and are protected by modern technologies. Information about your investments is always available in your personal account."
+      },
+      {
+        "question": "How to contact support?",
+        "answer": "You can email us at <a href=\"mailto:support@agrichain.kz\" class=\"text-green-700 underline font-semibold\">support@agrichain.kz</a> or in <a href=\"https://t.me/agrichain_support\" target=\"_blank\" class=\"text-green-700 underline font-semibold\">Telegram</a>."
+      }
+    ],
+    "notFound": "Didn't find your answer?",
+    "contactSupport": "Contact support"
+  },
+  "footer": {
+    "slogan": "Transparent investments in the agricultural sector on blockchain. Support farmers — invest in the future!",
+    "sections": "Sections",
+    "contact": "Contact us",
+    "support": "Support",
+    "subscribe": "Get news",
+    "emailPlaceholder": "Your email",
+    "noSpam": "We do not send spam",
+    "rights": "All rights reserved.",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Use"
+  },
+  "investments": {
+    "cardTitle": "Investment №{{number}}",
+    "status": "Status",
+    "type": "Type",
+    "amount": "Amount",
+    "invest": "Invest",
+    "sold": "Sold",
+    "availableLots": "Available investment lots",
+    "noLots": "No available lots",
+    "choosePayment": "Choose payment method",
+    "yourLots": "Your investment lots",
+    "noYourLots": "You have no listed lots",
+    "unknownAccountType": "Account type is not defined."
+  },
+  "transactions": {
+    "cardTitle": "Payment №{{number}}",
+    "status": "Status",
+    "amount": "Amount",
+    "title": "Transaction history",
+    "noTransactions": "No transactions"
+  },
+  "personal": {
+    "title": "Personal account",
+    "editProfile": "Edit profile",
+    "profileNumber": "Profile number",
+    "accountType": "Account type",
+    "myInvestments": "My investments",
+    "noInvestments": "No investments yet.",
+    "noUserData": "No user data found."
+  },
+  "common": {
+    "loading": "Loading...",
+    "close": "Close",
+    "error": "Error"
+  }
+}

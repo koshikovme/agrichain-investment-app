@@ -1,30 +1,11 @@
 import React, { useState } from 'react';
-
-const faqData = [
-    {
-        question: 'Как происходит оплата?',
-        answer: '\b>AgriChain</b> поддерживает оплату через <b>PayPal</b> и <b>Solana Pay</b>. Выберите удобный способ при инвестировании в проекты.',
-    },
-    {
-        question: 'Как инвестировать в агропроекты?',
-        answer: 'Перейдите в раздел <b>Инвестиции</b>, выберите интересующий лот и нажмите <b>Инвестировать</b>. Выберите способ оплаты: PayPal или Solana Pay.',
-    },
-    {
-        question: 'Как фермеру разместить инвестиционный лот?',
-        answer: 'После регистрации как фермер заполните форму <b>Создать инвестиционный лот</b> на странице инвестиций. Укажите сумму, тип и описание проекта.',
-    },
-    {
-        question: 'Безопасны ли мои средства?',
-        answer: 'Все транзакции проходят через блокчейн и защищены современными технологиями. Информация о ваших инвестициях всегда доступна в личном кабинете.',
-    },
-    {
-        question: 'Как связаться с поддержкой?',
-        answer: 'Вы можете написать нам на <a href="mailto:support@agrichain.kz" class="text-green-700 underline font-semibold">support@agrichain.kz</a> или в <a href="https://t.me/agrichain_support" target="_blank" class="text-green-700 underline font-semibold">Telegram</a>.',
-    },
-];
+import { useTranslation } from 'react-i18next';
 
 const FAQ = () => {
+    const { t } = useTranslation();
     const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+    const faqData = t('faq.items', { returnObjects: true }) as Array<{ question: string; answer: string }>;
 
     const toggleFaq = (index: number) => {
         setOpenIndex(openIndex === index ? null : index);
@@ -33,12 +14,12 @@ const FAQ = () => {
     return (
         <section className="py-12 bg-gradient-to-r from-green-50 via-yellow-50 to-green-100 sm:py-16 lg:py-24">
             <div className="px-4 mx-auto sm:px-6 lg:px-8 max-w-4xl">
-                <div className="max-w-2xl mx-auto text-center mb-10">
+                <div className="max-w-2xl mx-auto text-centeрека дракаr mb-10">
                     <h2 className="text-3xl font-bold leading-tight text-green-900 sm:text-4xl lg:text-5xl font-pj">
-                        Часто задаваемые вопросы
+                        {t('faq.title')}
                     </h2>
                     <p className="max-w-xl mx-auto mt-4 text-lg leading-relaxed text-green-700">
-                        Всё, что вы хотели узнать о платформе AgriChain
+                        {t('faq.subtitle')}
                     </p>
                 </div>
                 <div className="max-w-3xl mx-auto mt-8 space-y-4 md:mt-12">
@@ -90,7 +71,10 @@ const FAQ = () => {
 
                 </div>
                 <p className="text-center text-green-700 text-base mt-10">
-                    Не нашли ответа? <a href="mailto:support@agrichain.kz" className="font-semibold underline hover:text-green-900 transition">Свяжитесь с поддержкой</a>
+                    {t('faq.notFound')}{' '}
+                    <a href="mailto:support@agrichain.kz" className="font-semibold underline hover:text-green-900 transition">
+                        {t('faq.contactSupport')}
+                    </a>
                 </p>
             </div>
         </section>

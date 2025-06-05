@@ -11,7 +11,7 @@ export const useUserWebSocket = (mobileNumber: string) => {
         if (!keycloak.token || !mobileNumber) return;
 
         const client = new Client({
-            brokerURL: "ws://gatewayserver:8072/ws/users",
+            brokerURL: "ws://localhost:8072/ws/users",
             connectHeaders: {
                 Authorization: `Bearer ${keycloak.token}`,
             },

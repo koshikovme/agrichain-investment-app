@@ -1,28 +1,5 @@
 import React from 'react';
-
-const reviews = [
-    {
-        name: "Илон Маск",
-        role: "Предприниматель, изобретатель",
-        avatar: "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcQU2JRbbl3LBOm_an3eI5iplFhOoLESyBwUfmWDO49BS1EYuGUE",
-        text: "«AgriChain — это будущее сельского хозяйства. Прозрачность блокчейна и поддержка фермеров — именно то, что нужно для устойчивого развития планеты!»",
-        stars: 5,
-    },
-    {
-        name: "Рикардо Милос",
-        role: "Инвестор, энтузиаст блокчейна",
-        avatar: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQgummKJ_A8DlzM3VmTd6sEHYuYYFZchEB8rA&s",
-        text: "«Я инвестировал в AgriChain и не пожалел! Всё просто, быстро и безопасно. Поддерживаю фермеров и получаю стабильный доход!»",
-        stars: 5,
-    },
-    {
-        name: "Касым-Жомарт Токаев",
-        role: "Президент Республики Казахстан",
-        avatar: "https://upload.wikimedia.org/wikipedia/commons/1/13/Kassym-Jomart_Tokayev_%282020-02-01%29.jpg",
-        text: "«AgriChain — отличный пример инноваций в агросекторе Казахстана. Прозрачные инвестиции помогают развитию сельского хозяйства и поддерживают наших фермеров.»",
-        stars: 5,
-    },
-];
+import { useTranslation } from 'react-i18next';
 
 const StarIcons = ({ count }: { count: number }) => (
     <>
@@ -41,19 +18,27 @@ const StarIcons = ({ count }: { count: number }) => (
 );
 
 const Reviews = () => {
+    const { t } = useTranslation();
+    const reviews = t('reviews.items', { returnObjects: true }) as Array<{
+        name: string;
+        role: string;
+        avatar: string;
+        text: string;
+        stars: number;
+    }>;
+
     return (
         <section className="py-12 bg-gradient-to-r from-green-50 via-yellow-50 to-green-100 sm:py-16 lg:py-20 mt-6">
             <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
                 <div className="flex flex-col items-center">
                     <div className="text-center">
                         <p className="text-lg font-medium text-green-700 font-pj">
-                            Более 2,000 инвесторов уже с нами
+                            {t('reviews.subtitle')}
                         </p>
                         <h2 className="mt-4 text-3xl font-bold text-green-900 sm:text-4xl xl:text-5xl font-pj">
-                            Отзывы о платформе AgriChain
+                            {t('reviews.title')}
                         </h2>
                     </div>
-
 
                     <div className="relative mt-10 md:mt-24 md:order-2">
                         <div className="absolute -inset-x-1 inset-y-16 md:-inset-x-2 md:-inset-y-6">

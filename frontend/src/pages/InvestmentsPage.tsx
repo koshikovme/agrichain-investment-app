@@ -18,58 +18,63 @@ import { fetchAllInvestments, fetchInvestments, investInLot } from "../features/
 import CreateInvestmentForm from "../components/CreateInvestmentForm";
 import SolanaPayLinkGenerator from "../features/solana/SolanaPayLinkGenerator";
 import {useInvestmentsWebSocket} from "../features/investment/useInvestmentsWebSocket";
+import { useTranslation } from "react-i18next";
 
 const appleFont = `"SF Pro Display","SF Pro Icons","Helvetica Neue","Helvetica","Arial",sans-serif`;
 
-const InvestmentCard = ({ inv, onInvest }: { inv: any; onInvest?: (id: number) => void }) => (
-    <Card
-        variant="outlined"
-        sx={{
-            borderRadius: 3,
-            boxShadow: 3,
-            transition: "transform 0.2s",
-            fontFamily: appleFont,
-            "&:hover": { transform: "translateY(-5px)", boxShadow: 6 },
-        }}
-    >
-        <CardContent>
-            <Typography variant="h6" fontWeight="bold" gutterBottom>
-                Инвестиция №{inv.investmentNumber}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-                Статус: {inv.investmentStatus}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-                Тип: {inv.investmentType}
-            </Typography>
-            <Typography variant="body1" fontWeight={500} mt={1}>
-                Сумма: <strong>{inv.sum} USD</strong>
-            </Typography>
-            <Typography variant="body2" mt={1}>
-                {inv.description}
-            </Typography>
-            {onInvest && inv.investmentStatus === "WAITING_FOR_INVESTMENTS" ? (
-                <Button
-                    fullWidth
-                    variant="contained"
-                    sx={{ mt: 2, borderRadius: 2, fontFamily: appleFont }}
-                    onClick={() => onInvest(inv.investmentNumber)}
-                >
-                    Инвестировать
-                </Button>
-            ) : !onInvest && inv.investmentStatus === "WAITING_FOR_INVESTMENTS" ? null : (
-                <Typography
-                    variant="subtitle1"
-                    sx={{ mt: 2, fontWeight: "bold", color: "gray", fontFamily: appleFont }}
-                >
-                    Продано
+const InvestmentCard = ({ inv, onInvest }: { inv: any; onInvest?: (id: number) => void }) => {
+    const { t } = useTranslation();
+    return (
+        <Card
+            variant="outlined"
+            sx={{
+                borderRadius: 3,
+                boxShadow: 3,
+                transition: "transform 0.2s",
+                fontFamily: appleFont,
+                "&:hover": { transform: "translateY(-5px)", boxShadow: 6 },
+            }}
+        >
+            <CardContent>
+                <Typography variant="h6" fontWeight="bold" gutterBottom>
+                    {t('investments.cardTitle', { number: inv.investmentNumber })}
                 </Typography>
-            )}
-        </CardContent>
-    </Card>
-);
+                <Typography variant="body2" color="text.secondary">
+                    {t('investments.status')}: {inv.investmentStatus}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                    {t('investments.type')}: {inv.investmentType}
+                </Typography>
+                <Typography variant="body1" fontWeight={500} mt={1}>
+                    {t('investments.amount')}: <strong>{inv.sum} USD</strong>
+                </Typography>
+                <Typography variant="body2" mt={1}>
+                    {inv.description}
+                </Typography>
+                {onInvest && inv.investmentStatus === "WAITING_FOR_INVESTMENTS" ? (
+                    <Button
+                        fullWidth
+                        variant="contained"
+                        sx={{ mt: 2, borderRadius: 2, fontFamily: appleFont }}
+                        onClick={() => onInvest(inv.investmentNumber)}
+                    >
+                        {t('investments.invest')}
+                    </Button>
+                ) : !onInvest && inv.investmentStatus === "WAITING_FOR_INVESTMENTS" ? null : (
+                    <Typography
+                        variant="subtitle1"
+                        sx={{ mt: 2, fontWeight: "bold", color: "gray", fontFamily: appleFont }}
+                    >
+                        {t('investments.sold')}
+                    </Typography>
+                )}
+            </CardContent>
+        </Card>
+    );
+};
 
 const InvestmentsPage = () => {
+    const { t } = useTranslation();
     const dispatch = useAppDispatch();
     useInvestmentsWebSocket(); // Подключаем WebSocket для обновления инвестиций
     const { userInfo, isLoading, error } = useAppSelector((state) => state.reducer.user);
@@ -117,7 +122,7 @@ const InvestmentsPage = () => {
         setOpen(false);
     };
 
-    if (isLoading) return <Typography>Загрузка...</Typography>;
+    if (isLoading) return <Typography>{t('common.loading')}</Typography>;
     if (error) return <Typography color="error">{error}</Typography>;
 
     if (userInfo.accountsDto?.accountType === "INVESTORS") {
@@ -129,62 +134,17 @@ const InvestmentsPage = () => {
                     align="center"
                     sx={{ fontFamily: appleFont, fontWeight: 700, mb: 4 }}
                 >
-                    Доступные инвестиционные лоты
+                    {t('investments.availableLots')}
                 </Typography>
                 {investments.length === 0 ? (
                     <Typography color="text.secondary" align="center">
-                        Нет доступных лотов
+                        {t('investments.noLots')}
                     </Typography>
                 ) : (
                     <Grid container spacing={3} justifyContent="center">
                         {investments.map((inv) => (
                             <Grid key={inv.investmentNumber}>
-                                <Card
-                                    variant="outlined"
-                                    sx={{
-                                        borderRadius: 3,
-                                        boxShadow: 3,
-                                        transition: "transform 0.2s",
-                                        fontFamily: appleFont,
-                                        "&:hover": { transform: "translateY(-5px)", boxShadow: 6 },
-                                    }}
-                                >
-                                    <CardContent>
-                                        <Typography variant="h6" fontWeight="bold" gutterBottom>
-                                            Инвестиция №{inv.investmentNumber}
-                                        </Typography>
-                                        <Typography variant="body2" color="text.secondary">
-                                            Статус: {inv.investmentStatus}
-                                        </Typography>
-                                        <Typography variant="body2" color="text.secondary">
-                                            Тип: {inv.investmentType}
-                                        </Typography>
-                                        <Typography variant="body1" fontWeight={500} mt={1}>
-                                            Сумма: <strong>{inv.sum} USD</strong>
-                                        </Typography>
-                                        <Typography variant="body2" mt={1}>
-                                            {inv.description}
-                                        </Typography>
-                                        {inv.investmentStatus === "WAITING_FOR_INVESTMENTS" && (
-                                            <Button
-                                                fullWidth
-                                                variant="contained"
-                                                sx={{ mt: 2, borderRadius: 2, fontFamily: appleFont }}
-                                                onClick={() => handleInvestClick(inv.investmentNumber)}
-                                            >
-                                                Инвестировать
-                                            </Button>
-                                        )}
-                                        {inv.investmentStatus !== "WAITING_FOR_INVESTMENTS" && (
-                                            <Typography
-                                                variant="subtitle1"
-                                                sx={{ mt: 2, fontWeight: "bold", color: "gray", fontFamily: appleFont }}
-                                            >
-                                                Продано
-                                            </Typography>
-                                        )}
-                                    </CardContent>
-                                </Card>
+                                <InvestmentCard inv={inv} onInvest={handleInvestClick} />
                             </Grid>
                         ))}
                     </Grid>
@@ -192,7 +152,7 @@ const InvestmentsPage = () => {
 
                 {/* Модальное окно выбора способа оплаты */}
                 <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
-                    <DialogTitle>Выберите способ оплаты</DialogTitle>
+                    <DialogTitle>{t('investments.choosePayment')}</DialogTitle>
                     <DialogContent>
                         {!showSolana ? (
                             <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}>
@@ -220,7 +180,7 @@ const InvestmentsPage = () => {
                         )}
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={() => setOpen(false)}>Закрыть</Button>
+                        <Button onClick={() => setOpen(false)}>{t('common.close')}</Button>
                     </DialogActions>
                 </Dialog>
             </Box>
@@ -237,11 +197,11 @@ const InvestmentsPage = () => {
                     align="center"
                     sx={{ fontFamily: appleFont, fontWeight: 700, mb: 4, mt: 2 }}
                 >
-                    Ваши инвестиционные лоты
+                    {t('investments.yourLots')}
                 </Typography>
                 {userInfo.investments?.length === 0 ? (
                     <Typography color="text.secondary" align="center">
-                        У вас нет размещённых лотов
+                        {t('investments.noYourLots')}
                     </Typography>
                 ) : (
                     <Grid container spacing={3} justifyContent={"center"}>
@@ -259,7 +219,7 @@ const InvestmentsPage = () => {
         );
     }
 
-    return <Typography>Тип аккаунта не определён.</Typography>;
+    return <Typography>{t('investments.unknownAccountType')}</Typography>;
 };
 
 export default InvestmentsPage;

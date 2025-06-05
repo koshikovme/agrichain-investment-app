@@ -16,12 +16,15 @@ import { fetchUserDetails } from "../../features/user/userSlice";
 import { keycloak } from "../../features/auth/keycloak";
 import UpdateProfileModal from "../UI/modal/UpdateProfileModal";
 import {useUserWebSocket} from "../../features/user/useUsersWebSocket";
+// добавляем импорт useTranslation
+import { useTranslation } from "react-i18next";
 
 const PersonalInformationPanel: FC = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const dispatch = useAppDispatch();
     const { userInfo, isLoading, error } = useAppSelector((state) => state.reducer.user);
     const { isAuthenticated } = useAppSelector((state) => state.reducer.auth);
+    const { t } = useTranslation();
 
     useUserWebSocket(userInfo.mobileNumber);
 
@@ -42,13 +45,13 @@ const PersonalInformationPanel: FC = () => {
     if (error) {
         return (
             <Box color="error.main" textAlign="center" mt={4}>
-                Error: {error}
+                {t('common.error')}: {error}
             </Box>
         );
     }
 
     if (!userInfo.name) {
-        return <Typography textAlign="center" mt={4}>No user data found.</Typography>;
+        return <Typography textAlign="center" mt={4}>{t('personal.noUserData')}</Typography>;
     }
 
     return (
@@ -107,7 +110,7 @@ const PersonalInformationPanel: FC = () => {
                                 "&:hover": { borderColor: "#388e3c", background: "#e8f5e9" }
                             }}
                         >
-                            ✏️ Редактировать профиль
+                            ✏️ {t('personal.editProfile')}
                         </Button>
                         <UpdateProfileModal open={modalOpen} onClose={() => setModalOpen(false)} />
                     </Box>
@@ -118,7 +121,7 @@ const PersonalInformationPanel: FC = () => {
                 <Grid container spacing={2} mb={2}>
                     <Grid>
                         <Typography variant="subtitle2" color="text.secondary">
-                            Номер профиля
+                            {t('personal.profileNumber')}
                         </Typography>
                         <Typography fontWeight={600} color="#2e7d32">
                             {userInfo.accountsDto?.accountNumber}
@@ -126,7 +129,7 @@ const PersonalInformationPanel: FC = () => {
                     </Grid>
                     <Grid>
                         <Typography variant="subtitle2" color="text.secondary">
-                            Тип счёта
+                            {t('personal.accountType')}
                         </Typography>
                         <Typography fontWeight={600} color="#2e7d32">
                             {userInfo.accountsDto?.accountType}
@@ -137,7 +140,7 @@ const PersonalInformationPanel: FC = () => {
                 <Divider sx={{ my: 3, borderColor: "#c8e6c9" }} />
 
                 <Typography variant="h6" mb={2} color="#388e3c">
-                    🌱 Мои инвестиции
+                    🌱 {t('personal.myInvestments')}
                 </Typography>
                 {userInfo.investments.length > 0 ? (
                     userInfo.investments.map((investment) => (
@@ -163,7 +166,7 @@ const PersonalInformationPanel: FC = () => {
                         </Card>
                     ))
                 ) : (
-                    <Typography color="text.secondary">Пока нет инвестиций.</Typography>
+                    <Typography color="text.secondary">{t('personal.noInvestments')}</Typography>
                 )}
             </Card>
         </Box>

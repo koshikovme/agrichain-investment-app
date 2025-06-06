@@ -15,7 +15,7 @@ export const useInvestmentsWebSocket = () => {
 
     const client = new Client({
       // Use the correct gateway port (8072) as mentioned in your setup
-      brokerURL: "ws://localhost:8072/ws/investments",
+      brokerURL: "ws://gatewayserver:8072/ws/investments",
       connectHeaders: {
         Authorization: `Bearer ${keycloak.token}`,
       },

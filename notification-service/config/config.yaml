@@ -1,5 +1,5 @@
 database:
-  host: "postgres"
+  host: "localhost"
   user: "postgres"
   password: "root"
   dbname: "postgres"
@@ -18,4 +18,4 @@ ports:
   http: 8081
   grpc: 50000
   ws: 6969
-  kafka: ["kafka:9092"]
+  kafka: ["localhost:9093"]

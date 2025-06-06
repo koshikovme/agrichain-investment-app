@@ -1,53 +1,66 @@
-// useNotificationWebSocket.ts
-import { useEffect, useState } from "react";
-import { socket } from "../../features/notification/websocketNotificationListener";
+import { useEffect, useRef, useState } from "react";
 
-export const useNotificationWebSocket = (userId: number) => {
-    const [notification, setNotification] = useState<string | null>(null);
+export type WebNotification = {
+    id: number;
+    subject: string;
+    body: string;
+};
+
+export const useNotificationWebSocket = (userId: number | null) => {
+    const [notifications, setNotifications] = useState<WebNotification[]>([]);
     const [open, setOpen] = useState(false);
+    const socketRef = useRef<WebSocket | null>(null);
 
     useEffect(() => {
         if (!userId) return;
 
-        const handleOpen = () => {
-            socket.send(JSON.stringify({ user_id: userId }));
-        };
+        const socket = new WebSocket("ws://localhost:6969/ws");
+        socketRef.current = socket;
 
-        const handleMessage = (event: MessageEvent) => {
+        socket.addEventListener("open", () => {
+            socket.send(JSON.stringify({ user_id: userId }));
+        });
+
+        socket.addEventListener("message", (event: MessageEvent) => {
             try {
                 const data = JSON.parse(event.data);
-                if (data && typeof data === "object" && "subject" in data && "body" in data) {
-                    const formattedBody = data.body.replace(/\n/g, "<br />");
-                    setNotification(`${data.subject}<br /><br />${formattedBody}`);
-                    setOpen(true);
-                } else {
-                    console.warn("Unexpected WebSocket message format:", data);
+
+                // Если пришёл объект с action: "unread_notifications"
+                if (
+                    data &&
+                    typeof data === "object" &&
+                    data.action === "unread_notifications" &&
+                    Array.isArray(data.data)
+                ) {
+                    setNotifications(data.data);
+                }
+                // Если пришёл массив уведомлений (старый формат)
+                else if (Array.isArray(data)) {
+                    setNotifications(data);
+                }
+                // Если пришло одно уведомление
+                else if (data && typeof data === "object" && "subject" in data && "body" in data && "id" in data) {
+                    setNotifications((prev) => [data, ...prev]);
                 }
             } catch (error) {
                 console.error("Failed to parse WebSocket message:", event.data, error);
             }
-        };
-
-
-        if (socket.readyState === WebSocket.OPEN) {
-            handleOpen();
-        } else {
-            socket.addEventListener("open", handleOpen);
-        }
-
-        socket.addEventListener("message", handleMessage);
+        });
 
         return () => {
-            socket.removeEventListener("open", handleOpen);
-            socket.removeEventListener("message", handleMessage);
+            socket.close();
         };
     }, [userId]);
 
-    const handleClose = () => setOpen(false);
-
+    const markAsRead = (id: number) => {
+        setNotifications((prev) => prev.filter((n) => n.id !== id));
+        socketRef.current?.send(JSON.stringify({ is_read: id }));
+    };
+    
     return {
+        notifications,
         open,
-        notification,
-        handleClose,
+        setOpen,
+        markAsRead,
     };
 };

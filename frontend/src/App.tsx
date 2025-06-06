@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/UI/navbar/Navbar";
+import Footer from "./components/UI/footer/Footer";
 import PersonalPage from "./pages/PersonalPage";
 import InvestmentsPage from "./pages/InvestmentsPage";
 import TransactionsPage from "./pages/TransactionsPage";
@@ -10,7 +11,7 @@ import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
 import "@solana/wallet-adapter-react-ui/styles.css";
 import MainPage from "./pages/MainPage";
 import SolanaPayLinkGenerator from "./features/solana/SolanaPayLinkGenerator";
-
+import './index.css'; 
 const ENDPOINT = "https://api.devnet.solana.com";
 
 const App = () => {
@@ -40,6 +41,7 @@ const App = () => {
                                     }
                                 />
                             </Routes>
+                        <Footer />
                         </div>
                     </Router>
                 </WalletModalProvider>

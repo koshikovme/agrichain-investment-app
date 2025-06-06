@@ -1,18 +1,31 @@
-export interface InvestmentState {
-    investments: InvestmentsDto[];
-    paypalUrl: string | null;
-    selectedInvestment: InvestmentsDto | null;
-    isLoading: boolean;
-    error: string | null;
-}
+import {PaymentResponseDto} from "../payment/paymentTypes";
 
-export interface InvestmentsDto {
+export type InvestmentType = 'CATTLE' | 'LAND' | 'EQUIPMENT' | 'CASH'; // уточни по enum backend
+export type ConfirmationType = 'PAYMENT' | 'CHECK' | 'ESCROW' | 'NFT';
+export type InvestmentLotStatus = 'OPEN' | 'UNDER_REVIEW' | 'CLOSED' | 'REJECTED';
+export type ApplicationStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'CANCELLED' | 'EXPIRED';
+
+export interface InvestmentLotsDto {
     investmentNumber: number;
-    investmentType: 'CATTLE' | 'LAND' | 'EQUIPMENT'; // Adjust according to your enum
+    investmentType: InvestmentType;
     accountNumber: number;
     sum: number;
     description: string;
-    investmentStatus: 'WAITING_FOR_INVESTMENTS' | 'INVESTED' | 'FINISHED'; // Adjust according to your enum
+    returnConditions: string;
+    requirements: string;
+    documentsUrl: string;
+    deadline: string; // ISO string format for LocalDateTime
+    confirmationType: ConfirmationType;
+    investmentStatus: InvestmentLotStatus;
+}
+
+export interface InvestmentApplicationDto {
+    lotId: number;
+    farmerId: number;
+    proposalText: string;
+    documentsUrl: string;
+    expectedProfit: string;
+    applicationStatus: ApplicationStatus;
 }
 
 export interface InvestmentRequestDto {
@@ -21,4 +34,14 @@ export interface InvestmentRequestDto {
     accountNumber: number;
     currency: string;
     mobileNumber: string;
+    paymentResponseDto: PaymentResponseDto | null;
+}
+
+export interface InvestmentState {
+    investmentLots: InvestmentLotsDto[];
+    investmentsApplications: InvestmentApplicationDto[];
+    selectedInvestmentLot: InvestmentLotsDto | null;
+    selectedInvestmentApplication: InvestmentApplicationDto | null;
+    isLoading: boolean;
+    error: string | null;
 }

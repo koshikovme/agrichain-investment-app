@@ -17,7 +17,8 @@ const initialState: UserState = {
             accountNumber: 0,
             accountType: ''
         },
-        investments: []
+        investmentsLots: [],
+        investmentsApplications: []
     },
     isLoading: false,
     error: null

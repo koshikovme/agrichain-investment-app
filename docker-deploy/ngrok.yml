@@ -1,0 +1,19 @@
+version: "2"
+authtoken: 2y9A6RaHteH917Ik1j4v9uqVquR_4Y78RzWc2UoiJPLwdRwPz
+web_addr: 0.0.0.0:8081
+update: false
+log: stdout
+
+tunnels:
+  frontend:
+    addr: frontend:3000
+    proto: http
+    subdomain: agrichain
+  keycloak:
+    addr: keycloak:8080
+    proto: http
+    subdomain: auth-agrichain
+  backend:
+    addr: gatewayserver:8072
+    proto: http
+    subdomain: api-agrichain

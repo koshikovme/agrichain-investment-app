@@ -1,6 +1,6 @@
 package com.agriculturalmarket.investments.websocket;
 
-import com.agriculturalmarket.investments.dto.InvestmentsDto;
+import com.agriculturalmarket.investments.dto.InvestmentLotsDto;
 import com.agriculturalmarket.investments.service.InvestmentsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -19,7 +19,7 @@ public class InvestmentsWebSocketSender {
     // Периодически отправлять все инвестиции всем подписчикам
     @Scheduled(fixedRate = 5000) // каждые 5 секунд
     public void sendAllInvestments() {
-        List<InvestmentsDto> allInvestments = investmentsService.fetchAllInvestments("temp_bootleneck_correlation_id");
+        List<InvestmentLotsDto> allInvestments = investmentsService.fetchAllInvestmentLots("temp_bootleneck_correlation_id");
         messagingTemplate.convertAndSend("/topic/investments", allInvestments);
     }
 }

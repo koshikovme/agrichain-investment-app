@@ -1,7 +1,7 @@
 import {createAsyncThunk, createSlice, PayloadAction} from '@reduxjs/toolkit';
 import axios from "axios";
 
-const API_URL = 'http://gatewayserver:8072/agrichain/users'
+const API_URL = process.env.REACT_APP_GATEWAY_USERS_URL || 'http://localhost:8072/agrichain/users';
 
 
 interface User {
@@ -9,7 +9,6 @@ interface User {
     email?: string;
     mobileNumber?: string;
     accountNumber?: number;
-    // можешь добавить другие поля, которые тебе нужны
 }
 
 interface AuthState {

@@ -2,10 +2,11 @@ import React, { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { fetchPayments } from "../features/payment/paymentsSlice";
 import { Box, Typography, Card, CardContent, Grid } from "@mui/material";
+import { PaymentResponseDto } from "../features/payment/paymentTypes";
 
 const appleFont = `"SF Pro Display","SF Pro Icons","Helvetica Neue","Helvetica","Arial",sans-serif`;
 
-const PaymentCard = ({ payment }: { payment: any }) => (
+const PaymentCard = ({ payment }: { payment: PaymentResponseDto }) => (
     <Card
         variant="outlined"
         sx={{
@@ -35,12 +36,11 @@ const PaymentCard = ({ payment }: { payment: any }) => (
 
 const TransactionsPage = () => {
     const dispatch = useAppDispatch();
-    const { isAuthenticated } = useAppSelector((state) => state.reducer.auth);
     const { payments } = useAppSelector((state) => state.reducer.payment);
 
     useEffect(() => {
         dispatch(fetchPayments());
-    }, [dispatch, isAuthenticated]);
+    }, [dispatch]);
 
     return (
         <Box sx={{ p: 3, fontFamily: appleFont }}>

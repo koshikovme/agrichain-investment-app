@@ -2,6 +2,7 @@ package com.agriculturalmarket.investments.service.grpcclient;
 
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import payment.PaymentServiceGrpc;
 import payment.Payment.*;
@@ -11,9 +12,12 @@ public class PaymentGrpcClient {
 
     private final PaymentServiceGrpc.PaymentServiceBlockingStub stub;
 
-    public PaymentGrpcClient() {
+    public PaymentGrpcClient(
+            @Value("${grpc.payment.host:localhost}") String host,
+            @Value("${grpc.payment.port:50051}") int port
+    ) {
         ManagedChannel channel = ManagedChannelBuilder
-                .forAddress("payment-api", 50051)
+                .forAddress(host, port)
                 .usePlaintext()
                 .build();
 

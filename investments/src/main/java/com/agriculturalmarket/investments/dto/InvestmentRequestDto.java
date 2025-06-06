@@ -9,4 +9,5 @@ public class InvestmentRequestDto {
    private Long accountNumber;
    private String currency;
    private String mobileNumber;
+   private PaymentResponseDto paymentResponseDto;
 }

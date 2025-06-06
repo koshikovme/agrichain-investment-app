@@ -1,0 +1,304 @@
+services:
+  keycloak:
+    image: koshikov1/agrichain-keycloak:latest
+    container_name: keycloak
+    ports:
+      - "8080:8080"
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    command:
+      - start-dev
+      - --hostname=https://auth-agrichain.eu.ngrok.io
+      - --hostname-strict=false
+      - --hostname-admin=https://auth-agrichain.eu.ngrok.io
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    extends:
+      file: common-config.yml
+      service: microservice-base-config
+
+  ngrok:
+    image: wernight/ngrok
+    container_name: ngrok
+    ports:
+      - "8088:8088" # diagnostics port if needed
+    command:
+      - /bin/sh
+      - -c
+      - |
+        ngrok start --all
+    volumes:
+      - ./ngrok.yml:/home/ngrok/.ngrok2/ngrok.yml
+    environment:
+      - NGROK_AUTH_TOKEN=2y9A6RaHteH917Ik1j4v9uqVquR_4Y78RzWc2UoiJPLwdRwPz
+    depends_on:
+      - keycloak
+      - gatewayserver
+      - frontend
+    networks:
+      - agrichain-net
+
+
+  gatewayserver:
+    image: gatewayserver:latest
+    build:
+      context: ../gatewayserver
+    container_name: gatewayserver-ms
+    ports:
+      - "8072:8072"
+    depends_on:
+      users:
+        condition: service_healthy
+      investments:
+        condition: service_healthy
+    environment:
+      SPRING_APPLICATION_NAME: "gatewayserver"
+    extends:
+      file: common-config.yml
+      service: microservice-configserver-config
+
+  configserver:
+    image: configserver:latest
+    build:
+      context: ../configserver
+    container_name: configserver-ms
+    ports:
+      - "8071:8071"
+    healthcheck:
+      test: "curl --fail --silent configserver:8071/actuator/health/readiness | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+    extends:
+      file: common-config.yml
+      service: microservice-base-config
+
+  eurekaserver:
+    image: eurekaserver:latest
+    build:
+      context: ../eurekaserver
+    container_name: eurekaserver-ms
+    ports:
+      - "8070:8070"
+    healthcheck:
+      test: "curl --fail --silent eurekaserver:8070/actuator/health/readiness | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    depends_on:
+      configserver:
+        condition: service_healthy
+    restart: unless-stopped
+    environment:
+      SPRING_APPLICATION_NAME: "eurekaserver"
+    extends:
+      file: common-config.yml
+      service: microservice-configserver-config
+
+  users:
+    image: users:latest
+    build:
+      context: ../users
+    container_name: users-ms
+    ports:
+      - "8060:8060"
+    healthcheck:
+      test: "curl --fail --silent users:8060/actuator/health/readiness | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    depends_on:
+      eurekaserver:
+        condition: service_healthy
+      configserver:
+        condition: service_healthy
+    environment:
+      SPRING_APPLICATION_NAME: "users"
+    restart: unless-stopped
+    extends:
+      file: common-config.yml
+      service: microservice-configserver-config
+
+  investments:
+    image: investments:latest
+    build:
+      context: ../investments
+    container_name: investments-ms
+    ports:
+      - "8090:8090"
+    healthcheck:
+      test: "curl --fail --silent investments:8090/actuator/health/readiness | grep UP || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+    depends_on:
+      eurekaserver:
+        condition: service_healthy
+      configserver:
+        condition: service_healthy
+    environment:
+      SPRING_APPLICATION_NAME: "investments"
+    extends:
+      file: common-config.yml
+      service: microservice-configserver-config
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - gatewayserver
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - REACT_APP_GATEWAY_USERS_URL=https://api-agrichain.eu.ngrok.io/agrichain/users
+      - REACT_APP_GATEWAY_INVESTMENTS_URL=https://api-agrichain.eu.ngrok.io/agrichain/investments
+    restart: unless-stopped
+    extends:
+      file: common-config.yml
+      service: microservice-base-config
+
+
+  notification-service:
+    build:
+      context: ../notification-service
+      dockerfile: ../notification-service/Dockerfile
+    container_name: notification-service
+    ports:
+      - "8081:8081"
+      - "50000:50000"
+      - "6969:6969"
+    depends_on:
+      kafka:
+        condition: service_started
+      migrate:
+        condition: service_completed_successfully
+    volumes:
+      - ../notification-service/config:/app/config
+      - ../notification-service/pkg/email:/app/pkg/email
+    extends:
+      file: common-config.yml
+      service: microservice-base-config
+
+  kafka:
+      image: bitnami/kafka:3.7
+      container_name: kafka
+      ports:
+        - "9092:9092"
+        - "9093:9093"
+        - "9094:9094"
+      environment:
+        - KAFKA_CFG_NODE_ID=0
+        - KAFKA_CFG_PROCESS_ROLES=controller,broker
+        - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9094
+        - KAFKA_CFG_LISTENERS=INTERNAL://:9092,EXTERNAL://:9093,CONTROLLER://:9094
+        - KAFKA_CFG_ADVERTISED_LISTENERS=INTERNAL://kafka:9092,EXTERNAL://localhost:9093
+        - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+        - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+        - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=INTERNAL
+        - ALLOW_PLAINTEXT_LISTENER=yes
+      extends:
+        file: common-config.yml
+        service: microservice-base-config
+
+
+  postgres:
+      image: postgres:15
+      container_name: postgres
+      environment:
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: root
+        POSTGRES_DB: postgres
+      ports:
+        - "5433:5432"
+      volumes:
+        - pgdata:/var/lib/postgresql/data
+      extends:
+        file: common-config.yml
+        service: microservice-base-config
+
+  migrate:
+      image: migrate/migrate
+      depends_on:
+        - postgres
+      volumes:
+        - ../notification-service/migrations:/migrations
+      command: [
+        "-path", "/migrations",
+        "-database", "postgres://postgres:root@postgres:5432/postgres?sslmode=disable",
+        "up"
+      ]
+      extends:
+        file: common-config.yml
+        service: microservice-base-config
+
+  payment-api:
+    build:
+      context: ../paypal-solana-service
+      dockerfile: ../paypal-solana-service/Dockerfile
+    ports:
+      - "50051:50051"
+    environment:
+      - SERVER_PORT=50051
+      - SERVER_BASE_URL=http://localhost:9080
+      - MONGODB_URI=mongodb://mongo:27017
+      - MONGODB_DATABASE=payment_api
+      - PAYPAL_CLIENT_ID=AaW5pvfAWhXHwkQaoYfkZN1hVJt-YkvoLCrMCKsBcNGQoqlQNYYBc9RBRKas6ZXYMYyXLxDGeQ8tgRig
+      - PAYPAL_CLIENT_SECRET=EN1M59MScTAEJnGraWNebLISU4WnuMmz3DBz4JooaHAks7Nudf6S6H7ToRGbJ2EWc0-YHD5mrtxWZI4_
+      - PAYPAL_SANDBOX=true
+      - SOLANA_ENDPOINT=https://api.devnet.solana.com
+      - SOLANA_PRIVATE_KEY=your-solana-private-key
+      - SOLANA_PROGRAM_ID=YRoyDgtmHvKDpFdksFPdcCB16ymBspq2kUhgVz18JFQ
+      - TS_SERVER_URL=http://ts-api:8083
+      - TS_CLIENT_PRIVATE_KEY=very-secret-key
+      - TS_CLIENT_TIMEOUT_SEC=10
+    depends_on:
+      - mongo
+      - ts-api
+    restart: unless-stopped
+    extends:
+      file: common-config.yml
+      service: microservice-base-config
+
+  ts-api:
+    build:
+      context: ../paypal-solana-service/ts-api
+      dockerfile: Dockerfile
+    ports:
+      - "8083:8083"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    extends:
+      file: common-config.yml
+      service: microservice-base-config
+
+  mongo:
+    image: mongo:6.0
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    restart: unless-stopped
+    extends:
+      file: common-config.yml
+      service: microservice-base-config
+
+
+volumes:
+    pgdata:
+    mongo-data:
+
+networks:
+  agrichain-net:
+    external: true

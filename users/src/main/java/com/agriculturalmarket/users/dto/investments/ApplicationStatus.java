@@ -1,0 +1,9 @@
+package com.agriculturalmarket.users.dto.investments;
+
+public enum ApplicationStatus {
+    PENDING,   // Bid is awaiting review
+    ACCEPTED,  // Bid has been accepted by the farmer
+    REJECTED,  // Bid has been rejected by the farmer
+    CANCELLED, // Bid has been cancelled by the investor or system
+    EXPIRED;   // Bid has expired without action
+}

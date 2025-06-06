@@ -1,6 +1,7 @@
 package com.agriculturalmarket.users.dto;
 
-import com.agriculturalmarket.users.dto.investments.InvestmentsDto;
+import com.agriculturalmarket.users.dto.investments.InvestmentApplicationDto;
+import com.agriculturalmarket.users.dto.investments.InvestmentLotsDto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
@@ -23,5 +24,6 @@ public class UserDetailsDto {
     private String firstName;
     private String lastName;
     private AccountsDto accountsDto;
-    private List<InvestmentsDto> investments;
+    private List<InvestmentLotsDto> investmentsLots;
+    private List<InvestmentApplicationDto> investmentsApplications;
 }

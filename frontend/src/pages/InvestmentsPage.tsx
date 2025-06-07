@@ -102,7 +102,7 @@ const InvestmentsPage = () => {
 
     useEffect(() => {
         if (isInvestor && myAccount) {
-            dispatch(fetchInvestments(myAccount));
+            dispatch(fetchAllInvestments());
         } else if (isFarmer) {
             dispatch(fetchAllInvestments());
         }
@@ -156,10 +156,10 @@ const InvestmentsPage = () => {
                             + Создать лот
                         </Button>
                     </Box>
-                    <Dialog open={openForm} onClose={() => setOpenForm(false)} maxWidth="sm" fullWidth>
-                        <DialogTitle sx={{ fontFamily: appleFont, fontWeight: 700 }}>
-                            Новый инвестиционный лот
-                        </DialogTitle>
+                    <Dialog sx={{ fontFamily: appleFont, fontWeight: 700, borderRadius: 30}} open={openForm} onClose={() => setOpenForm(false)} maxWidth="sm" fullWidth>
+                        {/*<DialogTitle sx={{ fontFamily: appleFont, fontWeight: 700 }}>*/}
+                        {/*    Новый инвестиционный лот*/}
+                        {/*</DialogTitle>*/}
                         <DialogContent>
                             <CreateInvestmentForm />
                         </DialogContent>

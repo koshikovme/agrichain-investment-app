@@ -43,7 +43,6 @@ const InvestmentFormFields: React.FC<Props> = ({ form, onInputChange, onSelectCh
             value={form.sum}
             onChange={onInputChange}
             fullWidth
-            inputProps={{ min: 0 }}
             sx={{ fontFamily: appleFont }}
         />
         <TextField
@@ -74,38 +73,11 @@ const InvestmentFormFields: React.FC<Props> = ({ form, onInputChange, onSelectCh
             label="Дедлайн (ISO)"
             name="deadline"
             value={form.deadline}
+            type={'datetime-local'}
             onChange={onInputChange}
             fullWidth
             sx={{ fontFamily: appleFont }}
         />
-        <FormControl fullWidth>
-            <InputLabel sx={{ fontFamily: appleFont }}>Тип подтверждения</InputLabel>
-            <Select
-                name="confirmationType"
-                value={form.confirmationType}
-                label="Тип подтверждения"
-                onChange={onSelectChange}
-                sx={{ fontFamily: appleFont }}
-            >
-                {confirmationTypes.map((type) => (
-                    <MenuItem key={type} value={type}>{type}</MenuItem>
-                ))}
-            </Select>
-        </FormControl>
-        <FormControl fullWidth>
-            <InputLabel sx={{ fontFamily: appleFont }}>Статус</InputLabel>
-            <Select
-                name="investmentStatus"
-                value={form.investmentStatus}
-                label="Статус"
-                onChange={onSelectChange}
-                sx={{ fontFamily: appleFont }}
-            >
-                {investmentStatuses.map((status) => (
-                    <MenuItem key={status} value={status}>{status}</MenuItem>
-                ))}
-            </Select>
-        </FormControl>
     </Box>
 );
 

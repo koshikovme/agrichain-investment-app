@@ -13,8 +13,9 @@ import {
 } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material/Select';
 import { useNotificationWebSocket } from "../features/notification/useNotificationWebSocket";
-import FileUpload from './upload/FileUpload'; // ваш компонент загрузки
+import FileUpload from './upload/FileUpload';
 import { uploadFile, resetUploadState } from '../features/upload/uploadSlice';
+import InvestmentFormFields from './InvestmentFormFields';
 
 const appleFont = `"SF Pro Display","SF Pro Icons","Helvetica Neue","Helvetica","Arial",sans-serif`;
 
@@ -26,7 +27,7 @@ const CreateInvestmentForm = () => {
     const dispatch = useAppDispatch();
     const { userInfo } = useAppSelector((state) => state.reducer.user);
     const upload = useAppSelector((state) => state.reducer.upload);
-    const { open, notification, handleClose } = useNotificationWebSocket(userInfo.accountsDto.accountNumber);
+    const { open, setOpen, notifications } = useNotificationWebSocket(userInfo.accountsDto.accountNumber);
 
     const [form, setForm] = useState<Partial<InvestmentLotsDto>>({
         investmentType: 'CATTLE',
@@ -50,7 +51,7 @@ const CreateInvestmentForm = () => {
         if (upload.success && upload.fileUrl) {
             setForm((prev) => ({
                 ...prev,
-                documentsUrl: upload.fileUrl ?? undefined, // не null!
+                documentsUrl: upload.fileUrl ?? undefined,
             }));
         }
     }, [upload.success, upload.fileUrl]);
@@ -78,6 +79,14 @@ const CreateInvestmentForm = () => {
             return;
         }
 
+
+        if (!form.deadline) {
+            alert('Неверный формат даты. Используйте формат yyyy-MM-ddTHH:mm');
+            return;
+        } else {
+            form.deadline += ':00';
+        }
+
         const investmentPayload: InvestmentLotsDto = {
             investmentNumber: 0,
             investmentType: form.investmentType as InvestmentType,
@@ -102,6 +111,14 @@ const CreateInvestmentForm = () => {
         }
     };
 
+    // Получаем последнее уведомление для показа
+    const lastNotification = notifications.length > 0 ? notifications[0] : null;
+
+    const handleClose = (_event?: React.SyntheticEvent | Event, reason?: string) => {
+        if (reason === 'clickaway') return;
+        setOpen(false);
+    };
+
     return (
         <>
             <Paper elevation={4} sx={{ p: 4, mb: 3, borderRadius: 4, maxWidth: 500, mx: 'auto', fontFamily: appleFont, background: 'rgba(255,255,255,0.95)' }}>
@@ -109,7 +126,11 @@ const CreateInvestmentForm = () => {
                     Создать инвестиционный лот
                 </Typography>
                 <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2, fontFamily: appleFont }}>
-                    {/* ...другие поля... */}
+                    <InvestmentFormFields
+                        form={form}
+                        onInputChange={handleInputChange}
+                        onSelectChange={handleSelectChange}
+                    />
                     <FormControl fullWidth>
                         <InputLabel sx={{ fontFamily: appleFont }}>Тип подтверждения</InputLabel>
                         <Select
@@ -124,7 +145,6 @@ const CreateInvestmentForm = () => {
                             ))}
                         </Select>
                     </FormControl>
-                    {/* Загрузка файла подтверждения */}
                     <FileUpload onFileSelect={handleFileUpload} />
                     {upload.isLoading && <Typography>Загрузка файла...</Typography>}
                     {upload.error && <Alert severity="error">{upload.error}</Alert>}
@@ -136,9 +156,16 @@ const CreateInvestmentForm = () => {
                     </Button>
                 </Box>
             </Paper>
-            <Snackbar open={open} autoHideDuration={6000} onClose={handleClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
+            <Snackbar open={open && !!lastNotification} autoHideDuration={6000} onClose={handleClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
                 <Alert onClose={handleClose} severity="info" sx={{ width: '100%' }}>
-                    <div dangerouslySetInnerHTML={{ __html: notification || '' }} />
+                    <div>
+                        {lastNotification ? (
+                            <>
+                                <strong>{lastNotification.subject}</strong>
+                                <div>{lastNotification.body}</div>
+                            </>
+                        ) : null}
+                    </div>
                 </Alert>
             </Snackbar>
         </>

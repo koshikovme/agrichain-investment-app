@@ -203,6 +203,19 @@ public class AccountsServiceImpl implements IAccountsService {
     }
 
 
+    @Override
+    public List<UserDetailsDto> fetchAllUserDetails(String correlationId) {
+        List<UsersDto> users = usersRepository.findAll().stream()
+            .map(user -> UserMapper.toDto(user, new UsersDto()))
+            .toList();
+        List<UserDetailsDto> details = new ArrayList<>();
+        for (UsersDto user : users) {
+            details.add(fetchUserDetails(correlationId, user.getMobileNumber()));
+        }
+        return details;
+    }
+
+
 
     @Override
     public boolean deleteAccount(String mobileNumber) {

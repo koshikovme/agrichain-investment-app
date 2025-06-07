@@ -5,6 +5,7 @@ import com.agriculturalmarket.users.dto.ResponseDto;
 import com.agriculturalmarket.users.dto.UserDetailsDto;
 import com.agriculturalmarket.users.dto.UsersContactInfoDto;
 import com.agriculturalmarket.users.dto.UsersDto;
+import com.agriculturalmarket.users.repository.AccountsRepository;
 import com.agriculturalmarket.users.service.IAccountsService;
 import com.agriculturalmarket.users.service.grpcclient.NotificationGrpcClient;
 import com.agriculturalmarket.users.utils.Utils;
@@ -25,6 +26,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -37,6 +39,7 @@ public class AccountsController {
 
     private IAccountsService iAccountsService;
     private final UsersContactInfoDto usersContactInfoDto;
+    private final AccountsRepository accountsRepository;
 
     @PostMapping(path="/create-user")
     public ResponseEntity<Long> createAccount(
@@ -56,7 +59,6 @@ public class AccountsController {
     }
 
 
-
     @GetMapping("/fetch-user")
     public ResponseEntity<UsersDto> fetchUser(@RequestParam @Pattern(regexp="(^$|[0-9]{11})",message = "Mobile number must be 11 digits") String mobileNumber) {
         UsersDto usersDto = iAccountsService.fetchAccount(mobileNumber);
@@ -64,7 +66,6 @@ public class AccountsController {
                 .status(HttpStatus.OK)
                 .body(usersDto);
     }
-
 
     @GetMapping("/fetch-user-details")
     public ResponseEntity<UserDetailsDto> fetchUserDetails(
@@ -77,6 +78,16 @@ public class AccountsController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(userDetailsDto);
+    }
+
+
+    @GetMapping("/fetch-all-user-details")
+    public ResponseEntity<List<UserDetailsDto>> fetchAllUserDetails(
+            @RequestHeader("agrichain-correlation-id") String correlationId) {
+        List<UserDetailsDto> details = iAccountsService.fetchAllUserDetails(correlationId);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(details);
     }
 
 

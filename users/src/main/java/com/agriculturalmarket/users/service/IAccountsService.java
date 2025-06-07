@@ -4,6 +4,7 @@ package com.agriculturalmarket.users.service;
 import com.agriculturalmarket.users.dto.UserDetailsDto;
 import com.agriculturalmarket.users.dto.UsersDto;
 
+import java.util.List;
 import java.util.Map;
 
 public interface IAccountsService {
@@ -19,4 +20,6 @@ public interface IAccountsService {
     boolean updateAccount(UsersDto usersDto);
 
     boolean deleteAccount(String mobileNumber);
+
+    List<UserDetailsDto> fetchAllUserDetails(String correlationId);
 }

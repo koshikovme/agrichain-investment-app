@@ -4,7 +4,6 @@ import com.agriculturalmarket.users.config.KeycloakAdminProperties;
 import com.agriculturalmarket.users.dto.AccountsDto;
 import com.agriculturalmarket.users.dto.UserDetailsDto;
 import com.agriculturalmarket.users.dto.UsersDto;
-import com.agriculturalmarket.users.dto.investments.InvestmentsDto;
 import com.agriculturalmarket.users.entity.Role;
 import com.agriculturalmarket.users.entity.accounts.Accounts;
 import com.agriculturalmarket.users.entity.users.Users;
@@ -22,6 +21,8 @@ import lombok.AllArgsConstructor;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -29,6 +30,8 @@ import java.util.*;
 @Service
 @AllArgsConstructor
 public class AccountsServiceImpl implements IAccountsService {
+    private static final Logger logger = LoggerFactory.getLogger(AccountsServiceImpl.class);
+
     private final Keycloak keycloak;
     private final KeycloakAdminProperties keycloakProps;
 
@@ -67,7 +70,13 @@ public class AccountsServiceImpl implements IAccountsService {
                         .setName(newUser.getName())
                         .setUserId(newAccount.getAccountNumber())
                         .build();
-        notificationGrpcClient.sendRegistrationNotification(authNotificationRequest);
+        try {
+            notificationGrpcClient.sendRegistrationNotification(authNotificationRequest);
+        } catch (Exception e) {
+            // Логируйте stacktrace и сообщение
+            logger.error("gRPC error: ", e);
+            throw new RuntimeException("Notification service unavailable", e);
+        }
 
         return newAccount.getAccountNumber();
     }
@@ -117,7 +126,6 @@ public class AccountsServiceImpl implements IAccountsService {
     @Override
     public UserDetailsDto fetchUserDetails(String correlationId, String mobileNumber) {
         UsersDto usersDto = fetchAccount(mobileNumber);
-        List<InvestmentsDto> investments = investmentsFeignClient.fetchInvestments(correlationId, usersDto.getAccountsDto().getAccountNumber()).getBody();
 
         UserDetailsDto userDetailsDto = new UserDetailsDto();
         userDetailsDto.setName(usersDto.getName());
@@ -125,8 +133,15 @@ public class AccountsServiceImpl implements IAccountsService {
         userDetailsDto.setLastName(usersDto.getLastName());
         userDetailsDto.setEmail(usersDto.getEmail());
         userDetailsDto.setMobileNumber(usersDto.getMobileNumber());
-        userDetailsDto.setInvestments(investments);
         userDetailsDto.setAccountsDto(usersDto.getAccountsDto());
+
+        if (usersDto.getAccountsDto().getAccountType() == Role.INVESTORS) {
+            userDetailsDto.setInvestmentsLots(investmentsFeignClient.fetchInvestments(correlationId, usersDto.getAccountsDto().getAccountNumber()).getBody());
+        } else if (usersDto.getAccountsDto().getAccountType() == Role.FARMERS) {
+            userDetailsDto.setInvestmentsApplications(investmentsFeignClient.fetchAllInvestmentApplications(correlationId, usersDto.getAccountsDto().getAccountNumber()).getBody());
+        } else {
+            throw new IllegalArgumentException("Unsupported account type for fetching investments");
+        }
 
         return userDetailsDto;
     }
@@ -185,6 +200,19 @@ public class AccountsServiceImpl implements IAccountsService {
         userRep.setAttributes(attrs);
 
         userResource.update(userRep);
+    }
+
+
+    @Override
+    public List<UserDetailsDto> fetchAllUserDetails(String correlationId) {
+        List<UsersDto> users = usersRepository.findAll().stream()
+            .map(user -> UserMapper.toDto(user, new UsersDto()))
+            .toList();
+        List<UserDetailsDto> details = new ArrayList<>();
+        for (UsersDto user : users) {
+            details.add(fetchUserDetails(correlationId, user.getMobileNumber()));
+        }
+        return details;
     }
 
 

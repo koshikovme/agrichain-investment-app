@@ -4,6 +4,7 @@ import grpc.Notification;
 import grpc.NotificationServiceGrpc;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -11,9 +12,12 @@ public class NotificationGrpcClient {
 
     private final NotificationServiceGrpc.NotificationServiceBlockingStub stub;
 
-    public NotificationGrpcClient() {
+    public NotificationGrpcClient(
+            @Value("${grpc.payment.host:localhost}") String host,
+            @Value("${grpc.payment.port:50000}") int port
+    ) {
         ManagedChannel channel = ManagedChannelBuilder
-                .forAddress("localhost", 8081)
+                .forAddress(host, port)
                 .usePlaintext()
                 .build();
 

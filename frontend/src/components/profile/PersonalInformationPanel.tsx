@@ -15,24 +15,23 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { fetchUserDetails } from "../../features/user/userSlice";
 import { keycloak } from "../../features/auth/keycloak";
 import UpdateProfileModal from "../UI/modal/UpdateProfileModal";
-import {useUserWebSocket} from "../../features/user/useUsersWebSocket";
+import { useUserWebSocket } from "../../features/user/useUsersWebSocket";
 // добавляем импорт useTranslation
 import { useTranslation } from "react-i18next";
+import { InvestmentLotsDto } from "../../features/investment/investmentTypes";
 
 const PersonalInformationPanel: FC = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const dispatch = useAppDispatch();
     const { userInfo, isLoading, error } = useAppSelector((state) => state.reducer.user);
-    const { isAuthenticated } = useAppSelector((state) => state.reducer.auth);
     const { t } = useTranslation();
 
     useUserWebSocket(userInfo.mobileNumber);
 
     useEffect(() => {
-        console.log("AUTH STATUS:", isAuthenticated);
         const mobileNumber = keycloak.tokenParsed?.mobile_number;
         if (mobileNumber) dispatch(fetchUserDetails(mobileNumber));
-    }, [dispatch, isAuthenticated]);
+    }, [dispatch]);
 
     if (isLoading) {
         return (
@@ -142,8 +141,8 @@ const PersonalInformationPanel: FC = () => {
                 <Typography variant="h6" mb={2} color="#388e3c">
                     🌱 {t('personal.myInvestments')}
                 </Typography>
-                {userInfo.investments.length > 0 ? (
-                    userInfo.investments.map((investment) => (
+                {userInfo.investmentsLots && userInfo.investmentsLots.length > 0 ? (
+                    userInfo.investmentsLots.map((investment: InvestmentLotsDto) => (
                         <Card
                             key={investment.investmentNumber}
                             sx={{
@@ -159,7 +158,7 @@ const PersonalInformationPanel: FC = () => {
                                     #{investment.investmentNumber} — {investment.investmentStatus}
                                 </Typography>
                                 <Typography color="#fbc02d" fontWeight={600}>
-                                    💰 {investment.sum} KZT
+                                    💰 {investment.sum} USD
                                 </Typography>
                                 <Typography color="text.secondary">{investment.description}</Typography>
                             </CardContent>

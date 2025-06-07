@@ -1,10 +1,10 @@
 package com.agriculturalmarket.investments.controller;
 
-import com.agriculturalmarket.investments.dto.InvestmentRequestDto;
 import com.agriculturalmarket.investments.dto.InvestmentsContactInfoDto;
-import com.agriculturalmarket.investments.dto.InvestmentsDto;
-import com.agriculturalmarket.investments.entity.payments.PaymentDto;
-import com.agriculturalmarket.investments.repository.InvestmentsRepository;
+import com.agriculturalmarket.investments.dto.InvestmentLotsDto;
+import com.agriculturalmarket.investments.entity.investment.InvestmentApplication;
+import com.agriculturalmarket.investments.repository.InvestmentApplicationsRepository;
+import com.agriculturalmarket.investments.repository.InvestmentLotsRepository;
 import com.agriculturalmarket.investments.service.InvestmentsService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -19,51 +19,72 @@ import java.util.List;
 @AllArgsConstructor
 @RequestMapping(path="/api", produces= MediaType.APPLICATION_JSON_VALUE)
 public class InvestmentsController {
-    private final InvestmentsRepository investmentsRepository;
+    private final InvestmentLotsRepository investmentLotsRepository;
+    private final InvestmentApplicationsRepository investmentApplicationsRepository;
     private InvestmentsService investmentsService;
     private final InvestmentsContactInfoDto investmentsContactInfoDto;
 
     @PostMapping("/publish-investment-lot")
     public Long publishInvestmentLot(
             @RequestHeader("agrichain-correlation-id") String correlationId,
-            @Valid @RequestBody InvestmentsDto investmentsDto
+            @Valid @RequestBody InvestmentLotsDto investmentLotsDto
     ) {
-       return investmentsService.publishInvestmentLot(investmentsDto, correlationId);
+       return investmentsService.publishInvestmentLot(investmentLotsDto, correlationId);
     }
 
     @GetMapping("/fetch-investment")
-    public InvestmentsDto fetchInvestment(@RequestParam Long investmentNumber) {
-        return investmentsService.fetchInvestment(investmentNumber);
+    public InvestmentLotsDto fetchInvestment(@RequestParam Long investmentNumber) {
+        return investmentsService.fetchUserInvestmentLot(investmentNumber);
     }
 
     @GetMapping("/fetch-investments")
-    public List<InvestmentsDto> fetchInvestments(
+    public List<InvestmentLotsDto> fetchInvestments(
             @RequestHeader("agrichain-correlation-id") String correlationId,
             @RequestParam Long accountNumber
     ) {
-        return investmentsService.fetchInvestments(correlationId, accountNumber);
+        return investmentsService.fetchUserInvestmentLot(correlationId, accountNumber);
     }
 
     @GetMapping("/fetch-all-investments")
-    public List<InvestmentsDto> fetchAllInvestments(
+    public List<InvestmentLotsDto> fetchAllInvestments(
             @RequestHeader("agrichain-correlation-id") String correlationId
     ) {
-        return investmentsService.fetchAllInvestments(correlationId);
+        return investmentsService.fetchAllInvestmentLots(correlationId);
     }
 
-    @PostMapping("/invest")
-    public String invest(@Valid @RequestBody InvestmentRequestDto investmentRequestDto) {
-        return investmentsService.invest(investmentRequestDto);
+    @GetMapping("/fetch-investments-application")
+    public InvestmentApplication fetchInvestmentApplication(
+            @RequestHeader("agrichain-correlation-id") String correlationId,
+            @RequestParam Long investmentNumber,
+            @RequestParam Long accountNumber
+    ) {
+        return investmentsService.fetchInvestmentApplication(correlationId, investmentNumber, accountNumber);
+    }
+
+    @GetMapping("/fetch-investment-lot-applications")
+    public List<InvestmentApplication> fetchInvestmentLotApplications(
+            @RequestHeader("agrichain-correlation-id") String correlationId,
+            @RequestParam Long investmentNumber
+    ) {
+        return investmentsService.fetchInvestmentApplicationsOfInvestmentLot(correlationId, investmentNumber);
+    }
+
+    @GetMapping("/fetch-all-investment-applications")
+    public List<InvestmentApplication> fetchAllInvestmentApplications(
+            @RequestHeader("agrichain-correlation-id") String correlationId,
+            @RequestParam Long accountNumber
+    ) {
+        return investmentApplicationsRepository.findAllByFarmerId(accountNumber);
     }
 
     @PostMapping("update-investment")
-    public void updateInvestment(InvestmentsDto investmentsDto) {
-        investmentsService.updateInvestment(investmentsDto);
+    public void updateInvestment(InvestmentLotsDto investmentLotsDto) {
+        investmentsService.updateInvestmentLot(investmentLotsDto);
     }
 
     @GetMapping("delete-investment")
     public void deleteInvestment(@RequestParam Long investmentNumber) {
-        investmentsService.deleteInvestment(investmentNumber);
+        investmentsService.deleteInvestmentLot(investmentNumber);
     }
 
     @GetMapping("/contact-info")
@@ -71,10 +92,5 @@ public class InvestmentsController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(investmentsContactInfoDto);
-    }
-
-    @GetMapping("/get-payments")
-    public List<PaymentDto> getPayments() {
-        return investmentsService.getPayments();
     }
 }

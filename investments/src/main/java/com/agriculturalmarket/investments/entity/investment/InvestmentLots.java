@@ -5,13 +5,15 @@ import com.agriculturalmarket.investments.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Entity(name = "investments")
+import java.time.LocalDateTime;
+
+@Entity(name = "investment_lots")
 @Getter
 @Setter
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class Investments extends BaseEntity {
+public class InvestmentLots extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -27,6 +29,15 @@ public class Investments extends BaseEntity {
     @Column(name = "account_number")
     private Long accountNumber;
 
+    @Column(name = "return_conditions")
+    private String returnConditions;
+
+    @Column(name = "requirements")
+    private String requirements;
+
+    @Column(name = "deadline")
+    private LocalDateTime deadline;
+
     @Column(name = "amount")
     private Long amount;
 
@@ -34,6 +45,13 @@ public class Investments extends BaseEntity {
     private String description;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "confirmation_type", nullable = false)
+    private ConfirmationType confirmationType;
+
+    @Column(name = "documents_url")
+    private String documentsUrl;
+
+    @Enumerated(EnumType.STRING)
     @Column(name = "investment_status", nullable = false)
-    private InvestmentStatus investmentStatus;
+    private InvestmentLotStatus investmentLotStatus;
 }

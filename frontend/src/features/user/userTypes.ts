@@ -1,4 +1,4 @@
-import {InvestmentsDto} from "../investment/investmentTypes";
+import {InvestmentApplicationDto, InvestmentLotsDto} from "../investment/investmentTypes";
 
 export interface UserInfo {
     image: string | null;
@@ -8,7 +8,8 @@ export interface UserInfo {
     email: string;
     mobileNumber: string;
     accountsDto: AccountsDto
-    investments: InvestmentsDto[];
+    investmentsLots?: InvestmentLotsDto[];
+    investmentsApplications?: InvestmentApplicationDto[];
  }
 
  export interface UsersDto {

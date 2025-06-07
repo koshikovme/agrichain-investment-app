@@ -152,7 +152,18 @@
     "choosePayment": "Төлем тәсілін таңдаңыз",
     "yourLots": "Сіздің инвестициялық лоттарыңыз",
     "noYourLots": "Сізде жарияланған лоттар жоқ",
-    "unknownAccountType": "Аккаунт түрі анықталмаған."
+    "unknownAccountType": "Аккаунт түрі анықталмаған.",
+    "myInvestmentLots": "Менің инвестициялық лоттарым",
+    "availableLotsForApplication": "Өтінім беру үшін қолжетімді лоттар",
+    "createLot": "+ Лот құру",
+    "newInvestmentLot": "Жаңа инвестициялық лот",
+    "description": "Сипаттама",
+    "returnConditions": "Қайтару шарттары",
+    "requirements": "Талаптар",
+    "submitApplication": "Өтінім беру",
+    "payDividends": "Дивиденд төлеу",
+    "applicationSent": "№{{number}} лотқа өтінім жіберілді!",
+    "dividendsInitiated": "№{{number}} лот бойынша дивиденд төлеу басталды!"
   },
   "transactions": {
     "cardTitle": "Төлем №{{number}}",

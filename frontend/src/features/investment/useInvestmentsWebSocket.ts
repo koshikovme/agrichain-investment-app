@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Client } from "@stomp/stompjs";
 import { useAppDispatch } from "../../app/hooks";
-import { setInvestments } from "./investmentsSlice";
+import { setInvestmentLots } from "./investmentsSlice";
 import { keycloak } from "../auth/keycloak";
 
 export const useInvestmentsWebSocket = () => {
@@ -44,7 +44,7 @@ export const useInvestmentsWebSocket = () => {
       client.subscribe("/topic/investments", (message) => {
         try {
           const investments = JSON.parse(message.body);
-          dispatch(setInvestments(investments));
+          dispatch(setInvestmentLots(investments));
         } catch (error) {
           console.error("Error parsing investments message:", error);
         }

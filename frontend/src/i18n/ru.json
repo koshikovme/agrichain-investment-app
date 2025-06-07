@@ -152,7 +152,18 @@
     "choosePayment": "Выберите способ оплаты",
     "yourLots": "Ваши инвестиционные лоты",
     "noYourLots": "У вас нет размещённых лотов",
-    "unknownAccountType": "Тип аккаунта не определён."
+    "unknownAccountType": "Тип аккаунта не определён.",
+    "myInvestmentLots": "Мои инвестиционные лоты",
+    "availableLotsForApplication": "Доступные лоты для подачи заявки",
+    "createLot": "+ Создать лот",
+    "newInvestmentLot": "Новый инвестиционный лот",
+    "description": "Описание",
+    "returnConditions": "Условия возврата",
+    "requirements": "Требования",
+    "submitApplication": "Подать заявку",
+    "payDividends": "Выплатить дивиденды",
+    "applicationSent": "Заявка на лот №{{number}} отправлена!",
+    "dividendsInitiated": "Выплата дивидендов по лоту №{{number}} инициирована!"
   },
   "transactions": {
     "cardTitle": "Платёж №{{number}}",

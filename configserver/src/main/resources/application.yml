@@ -1,10 +1,11 @@
+server:
+  port: 8071
+
 spring:
   application:
     name: "configserver"
   profiles:
-    active: git # READ CONFIG FROM GIT
-#   active: native READ CONFIG FROM LOCAL COMPUTER
-
+    active: git
   cloud:
     config:
       server:
@@ -17,14 +18,6 @@ spring:
 
 encrypt:
   key: "45D81EC1EF61DF9AD8D3E5BB397F9"
-
-#        native:
-#          search-locations: "classpath:/config" INSIDE your resources folder inside this project
-#          search-locations: "file:///C://Users..." INSIDE your file system
-
-server:
-  port: 8071
-
 
 management:
   endpoints:

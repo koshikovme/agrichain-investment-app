@@ -1,7 +1,8 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import axios from 'axios'
-import {PaymentsDto, PaymentState} from "./paymentTypes";
+import {PaymentResponseDto, PaymentsDto, PaymentState} from "./paymentTypes";
 import {keycloak} from "../auth/keycloak";
+import {InvestmentRequestDto} from "../investment/investmentTypes";
 
 const API_URL = process.env.REACT_APP_GATEWAY_INVESTMENTS_URL || 'http://localhost:8072/agrichain/investments';
 
@@ -10,6 +11,7 @@ const initialState: PaymentState = {
     selectedPayment: null,
     isLoading: false,
     error: null,
+    paymentResponse: null,
 };
 
 
@@ -24,13 +26,58 @@ export const fetchPayments = createAsyncThunk(
                     'Content-Type': 'application/json',
                 },
             });
-            return response.data as PaymentsDto[];
+            return response.data as PaymentResponseDto[];
         } catch (error) {
             return rejectWithValue('Failed to fetch payments');
         }
     }
 );
 
+
+// Создать платёж
+export const createPaymentForInvestment = createAsyncThunk(
+    'investment/createPaymentForInvestment',
+    async (investmentRequest: InvestmentRequestDto, { rejectWithValue }) => {
+        try {
+            const response = await axios.post(
+                `${API_URL}/create-payment`,
+                investmentRequest,
+                {
+                    headers: {
+                        Authorization: `Bearer ${keycloak.token}`,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            );
+            return response.data as PaymentResponseDto;
+        } catch (error) {
+            return rejectWithValue('Failed to create payment');
+        }
+    }
+);
+
+// Исполнить платёж
+export const executePaymentForInvestment = createAsyncThunk(
+    'investment/executePaymentForInvestment',
+    async (investmentRequest: InvestmentRequestDto, { rejectWithValue }) => {
+        try {
+            const response = await axios.post(
+                `${API_URL}/execute-payment`,
+                investmentRequest,
+                {
+                    headers: {
+                        Authorization: `Bearer ${keycloak.token}`,
+                        'Content-Type': 'application/json',
+                        'agrichain-correlation-id': 'frontend',
+                    },
+                }
+            );
+            return response.data as PaymentResponseDto;
+        } catch (error) {
+            return rejectWithValue('Failed to execute payment');
+        }
+    }
+);
 
 
 const paymentSlice = createSlice({
@@ -57,6 +104,12 @@ const paymentSlice = createSlice({
             .addCase(fetchPayments.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload as string;
+            })
+            .addCase(createPaymentForInvestment.fulfilled, (state, action: PayloadAction<PaymentResponseDto>) => {
+                state.paymentResponse = action.payload;
+            })
+            .addCase(executePaymentForInvestment.fulfilled, (state, action: PayloadAction<PaymentResponseDto>) => {
+                state.paymentResponse = action.payload;
             })
     }
 });

@@ -1,7 +1,7 @@
 services:
   network-deploy-service:
     networks:
-      - agrichain
+      - agrichain-net
 
   microservice-base-config:
     extends:
@@ -9,17 +9,11 @@ services:
     deploy:
       resources:
         limits:
-          memory: 5G
+          memory: 4G
 
   microservice-configserver-config:
     extends:
       service: microservice-base-config
     environment:
       SPRING_PROFILES_ACTIVE: prod
-      SPRING_CONFIG_IMPORT: configserver:http://configserver:8071/
-
-  microservice-eureka-config:
-    extends:
-      service: microservice-configserver-config
-    environment:
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eurekaserver:8070/eureka/
+      SPRING_CONFIG_IMPORT: http://configserver:8071/

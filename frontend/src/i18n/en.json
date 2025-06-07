@@ -152,7 +152,18 @@
     "choosePayment": "Choose payment method",
     "yourLots": "Your investment lots",
     "noYourLots": "You have no listed lots",
-    "unknownAccountType": "Account type is not defined."
+    "unknownAccountType": "Account type is not defined.",
+    "myInvestmentLots": "My investment lots",
+    "availableLotsForApplication": "Available lots for application",
+    "createLot": "+ Create lot",
+    "newInvestmentLot": "New investment lot",
+    "description": "Description",
+    "returnConditions": "Return conditions",
+    "requirements": "Requirements",
+    "submitApplication": "Submit application",
+    "payDividends": "Pay dividends",
+    "applicationSent": "Application for lot №{{number}} sent!",
+    "dividendsInitiated": "Dividend payment for lot №{{number}} initiated!"
   },
   "transactions": {
     "cardTitle": "Payment №{{number}}",

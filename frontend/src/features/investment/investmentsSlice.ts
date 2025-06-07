@@ -1,22 +1,27 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
-import axios from 'axios'
-import {InvestmentRequestDto, InvestmentsDto, InvestmentState} from "./investmentTypes";
-import {keycloak} from "../auth/keycloak";
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import axios from 'axios';
+import {
+    InvestmentLotsDto,
+    InvestmentApplicationDto,
+    InvestmentState,
+} from './investmentTypes';
+import { keycloak } from '../auth/keycloak';
 
 const API_URL = process.env.REACT_APP_GATEWAY_INVESTMENTS_URL || 'http://localhost:8072/agrichain/investments';
 
 const initialState: InvestmentState = {
-    investments: [],
-    paypalUrl: '',
-    selectedInvestment: null,
+    investmentLots: [],
+    investmentsApplications: [],
+    selectedInvestmentLot: null,
+    selectedInvestmentApplication: null,
     isLoading: false,
     error: null,
 };
 
-// ✅ /publish-investment-lot
+// Публикация лота
 export const publishInvestmentLot = createAsyncThunk(
     'investment/publishInvestmentLot',
-    async (investmentData: InvestmentsDto, { rejectWithValue }) => {
+    async (investmentData: InvestmentLotsDto, { rejectWithValue }) => {
         try {
             const response = await axios.post(
                 `${API_URL}/publish-investment-lot`,
@@ -25,6 +30,7 @@ export const publishInvestmentLot = createAsyncThunk(
                     headers: {
                         Authorization: `Bearer ${keycloak.token}`,
                         'Content-Type': 'application/json',
+                        'agrichain-correlation-id': 'frontend',
                     },
                 }
             );
@@ -35,70 +41,115 @@ export const publishInvestmentLot = createAsyncThunk(
     }
 );
 
-// ✅ /fetch-investment
+// Получить один лот
 export const fetchInvestment = createAsyncThunk(
     'investment/fetchInvestment',
     async (investmentNumber: number, { rejectWithValue }) => {
         try {
-            const response = await axios.get(`${API_URL}/api/fetch-investment?investmentNumber=${investmentNumber}`);
-            return response.data as InvestmentsDto;
+            const response = await axios.get(`${API_URL}/fetch-investment`, {
+                params: { investmentNumber },
+                headers: {
+                    Authorization: `Bearer ${keycloak.token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+            return response.data as InvestmentLotsDto;
         } catch (error) {
             return rejectWithValue('Failed to fetch investment');
         }
     }
 );
 
-// ✅ /fetch-investments
+// Получить лоты по аккаунту
 export const fetchInvestments = createAsyncThunk(
     'investment/fetchInvestments',
     async (accountNumber: number, { rejectWithValue }) => {
         try {
-            const response = await axios.get(`${API_URL}/fetch-investments?accountNumber=${accountNumber}`);
-            return response.data as InvestmentsDto[];
+            const response = await axios.get(`${API_URL}/fetch-investments`, {
+                params: { accountNumber },
+                headers: {
+                    Authorization: `Bearer ${keycloak.token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+            return response.data as InvestmentLotsDto[];
         } catch (error) {
             return rejectWithValue('Failed to fetch investments');
         }
     }
 );
 
-// ✅ /fetch-all-investments
+// Получить все лоты
 export const fetchAllInvestments = createAsyncThunk(
     'investment/fetchAllInvestments',
     async () => {
-        const response = await axios.get(`${API_URL}/fetch-all-investments`);
-        return response.data as InvestmentsDto[];
+        const response = await axios.get(
+            `${API_URL}/fetch-all-investments`,
+            {
+                headers: {
+                    Authorization: `Bearer ${keycloak.token}`,
+                    'Content-Type': 'application/json',
+                },
+            }
+        );
+        return response.data as InvestmentLotsDto[];
     }
 );
 
-
-// ✅ /invest
-export const investInLot = createAsyncThunk(
-    'investment/investInLot',
-    async (investmentRequest: InvestmentRequestDto, { rejectWithValue }) => {
+// Получить одну заявку на лот
+export const fetchInvestmentApplication = createAsyncThunk(
+    'investment/fetchInvestmentApplication',
+    async ({ investmentNumber, accountNumber }: { investmentNumber: number; accountNumber: number }, { rejectWithValue }) => {
         try {
-            const response = await axios.post(
-                `${API_URL}/invest`,
-                investmentRequest,
-                {
-                    headers: {
-                        Authorization: `Bearer ${keycloak.token}`,
-                        'Content-Type': 'application/json',
-                    },
-                }
-            );
-            return response.data as string;
+            const response = await axios.get(`${API_URL}/fetch-investments-application`, {
+                params: { investmentNumber, accountNumber },
+                headers: { 'agrichain-correlation-id': 'frontend' },
+            });
+            return response.data as InvestmentApplicationDto;
         } catch (error) {
-            return rejectWithValue('Failed to invest');
+            return rejectWithValue('Failed to fetch investment application');
         }
     }
 );
 
-// ✅ /update-investment
+// Получить все заявки на лот
+export const fetchInvestmentLotApplications = createAsyncThunk(
+    'investment/fetchInvestmentLotApplications',
+    async (investmentNumber: number, { rejectWithValue }) => {
+        try {
+            const response = await axios.get(`${API_URL}/fetch-investment-lot-applications`, {
+                params: { investmentNumber },
+                headers: { 'agrichain-correlation-id': 'frontend' },
+            });
+            return response.data as InvestmentApplicationDto[];
+        } catch (error) {
+            return rejectWithValue('Failed to fetch investment lot applications');
+        }
+    }
+);
+
+// Получить все заявки пользователя
+export const fetchAllInvestmentApplications = createAsyncThunk(
+    'investment/fetchAllInvestmentApplications',
+    async (accountNumber: number, { rejectWithValue }) => {
+        try {
+            const response = await axios.get(`${API_URL}/fetch-all-investment-applications`, {
+                params: { accountNumber },
+                headers: { 'agrichain-correlation-id': 'frontend' },
+            });
+            return response.data as InvestmentApplicationDto[];
+        } catch (error) {
+            return rejectWithValue('Failed to fetch all investment applications');
+        }
+    }
+);
+
+// Обновить лот
 export const updateInvestment = createAsyncThunk(
     'investment/updateInvestment',
-    async (investment: InvestmentsDto, { rejectWithValue }) => {
+    async (investment: InvestmentLotsDto, { rejectWithValue }) => {
         try {
-            await axios.post(`${API_URL}/api/update-investment`, investment);
+            await axios.post(`${API_URL}/update-investment`, investment);
             return investment;
         } catch (error) {
             return rejectWithValue('Failed to update investment');
@@ -106,15 +157,30 @@ export const updateInvestment = createAsyncThunk(
     }
 );
 
-// ✅ /delete-investment
+// Удалить лот
 export const deleteInvestment = createAsyncThunk(
     'investment/deleteInvestment',
     async (investmentNumber: number, { rejectWithValue }) => {
         try {
-            await axios.get(`${API_URL}/api/delete-investment?investmentNumber=${investmentNumber}`);
+            await axios.get(`${API_URL}/delete-investment`, {
+                params: { investmentNumber },
+            });
             return investmentNumber;
         } catch (error) {
             return rejectWithValue('Failed to delete investment');
+        }
+    }
+);
+
+// Получить контактную информацию
+export const fetchContactInfo = createAsyncThunk(
+    'investment/fetchContactInfo',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await axios.get(`${API_URL}/contact-info`);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue('Failed to fetch contact info');
         }
     }
 );
@@ -124,14 +190,15 @@ const investmentSlice = createSlice({
     initialState,
     reducers: {
         resetInvestmentState: (state) => {
-            state.investments = [];
-            state.selectedInvestment = null;
+            state.investmentLots = [];
+            state.investmentsApplications = [];
+            state.selectedInvestmentLot = null;
+            state.selectedInvestmentApplication = null;
             state.isLoading = false;
             state.error = null;
         },
-        // Внутри createSlice reducers:
-        setInvestments: (state, action) => {
-            state.investments = action.payload;
+        setInvestmentLots: (state, action: PayloadAction<InvestmentLotsDto[]>) => {
+            state.investmentLots = action.payload;
         },
     },
     extraReducers: (builder) => {
@@ -140,53 +207,31 @@ const investmentSlice = createSlice({
                 state.isLoading = true;
                 state.error = null;
             })
-            .addCase(fetchInvestments.fulfilled, (state, action: PayloadAction<InvestmentsDto[]>) => {
+            .addCase(fetchInvestments.fulfilled, (state, action: PayloadAction<InvestmentLotsDto[]>) => {
                 state.isLoading = false;
-                state.investments = action.payload;
+                state.investmentLots = action.payload;
             })
             .addCase(fetchInvestments.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload as string;
             })
-
-
-            .addCase(investInLot.pending, (state) => {
-                state.isLoading = true;
-                state.error = null;
+            .addCase(fetchAllInvestments.fulfilled, (state, action: PayloadAction<InvestmentLotsDto[]>) => {
+                state.investmentLots = action.payload;
             })
-            .addCase(investInLot.fulfilled, (state, action: PayloadAction<string>) => {
-                state.isLoading = false;
-                state.paypalUrl = action.payload;
+            .addCase(fetchInvestment.fulfilled, (state, action: PayloadAction<InvestmentLotsDto>) => {
+                state.selectedInvestmentLot = action.payload;
             })
-            .addCase(investInLot.rejected, (state, action) => {
-                state.isLoading = false;
-                state.error = action.payload as string;
+            .addCase(fetchInvestmentLotApplications.fulfilled, (state, action: PayloadAction<InvestmentApplicationDto[]>) => {
+                state.investmentsApplications = action.payload;
             })
-
-
-
-            .addCase(fetchAllInvestments.pending, (state) => {
-                state.isLoading = true;
-                state.error = null;
+            .addCase(fetchAllInvestmentApplications.fulfilled, (state, action: PayloadAction<InvestmentApplicationDto[]>) => {
+                state.investmentsApplications = action.payload;
             })
-            .addCase(fetchAllInvestments.fulfilled, (state, action: PayloadAction<InvestmentsDto[]>) => {
-                state.isLoading = false;
-                state.investments = action.payload;
-            })
-            .addCase(fetchAllInvestments.rejected, (state, action) => {
-                state.isLoading = false;
-                state.error = action.payload as string;
-            })
-
-            .addCase(fetchInvestment.fulfilled, (state, action: PayloadAction<InvestmentsDto>) => {
-                state.selectedInvestment = action.payload;
-            })
-
             .addCase(deleteInvestment.fulfilled, (state, action: PayloadAction<number>) => {
-                state.investments = state.investments.filter(inv => inv.investmentNumber !== action.payload);
+                state.investmentLots = state.investmentLots.filter(inv => inv.investmentNumber !== action.payload);
             });
-    }
+    },
 });
 
-export const { resetInvestmentState, setInvestments } = investmentSlice.actions;
+export const { resetInvestmentState, setInvestmentLots } = investmentSlice.actions;
 export default investmentSlice.reducer;

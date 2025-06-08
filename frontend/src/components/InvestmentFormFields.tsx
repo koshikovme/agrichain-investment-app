@@ -70,10 +70,10 @@ const InvestmentFormFields: React.FC<Props> = ({ form, onInputChange, onSelectCh
             sx={{ fontFamily: appleFont }}
         />
         <TextField
-            label="Дедлайн (ISO)"
+            label="Дедлайн"
             name="deadline"
             value={form.deadline}
-            type={'datetime-local'}
+            type={"date"}
             onChange={onInputChange}
             fullWidth
             sx={{ fontFamily: appleFont }}

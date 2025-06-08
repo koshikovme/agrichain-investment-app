@@ -21,7 +21,7 @@ const appleFont = `"SF Pro Display","SF Pro Icons","Helvetica Neue","Helvetica",
 
 const investmentTypes: InvestmentType[] = ['CATTLE', 'LAND', 'EQUIPMENT', 'CASH'];
 const confirmationTypes: ConfirmationType[] = ['PAYMENT', 'CHECK', 'ESCROW', 'NFT'];
-const investmentStatuses: InvestmentLotStatus[] = ['OPEN', 'CLOSED'];
+const investmentStatuses: InvestmentLotStatus[] = ['OPEN', 'CLOSED', 'UNDER_REVIEW', 'REJECTED'];
 
 const CreateInvestmentForm = () => {
     const dispatch = useAppDispatch();
@@ -77,14 +77,6 @@ const CreateInvestmentForm = () => {
         if (!userInfo.accountsDto?.accountNumber) {
             alert('Не найден номер счёта пользователя');
             return;
-        }
-
-
-        if (!form.deadline) {
-            alert('Неверный формат даты. Используйте формат yyyy-MM-ddTHH:mm');
-            return;
-        } else {
-            form.deadline += ':00';
         }
 
         const investmentPayload: InvestmentLotsDto = {

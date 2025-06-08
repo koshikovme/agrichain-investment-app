@@ -17,7 +17,7 @@ public class NotificationGrpcClient {
             @Value("${grpc.payment.port:50000}") int port
     ) {
         ManagedChannel channel = ManagedChannelBuilder
-                .forAddress(host, port)
+                .forAddress("localhost", 50000)
                 .usePlaintext()
                 .build();
 

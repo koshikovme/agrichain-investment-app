@@ -17,7 +17,7 @@ public class PaymentGrpcClient {
             @Value("${grpc.payment.port:50051}") int port
     ) {
         ManagedChannel channel = ManagedChannelBuilder
-                .forAddress(host, port)
+                .forAddress("localhost", 50051)
                 .usePlaintext()
                 .build();
 

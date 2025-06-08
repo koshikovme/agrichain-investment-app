@@ -28,12 +28,14 @@ public class SecurityConfig {
 
     @Bean
     public ReactiveJwtDecoder reactiveJwtDecoder() {
-        NimbusReactiveJwtDecoder jwtDecoder = NimbusReactiveJwtDecoder.withJwkSetUri(
-                        "http://localhost:8080/realms/master/protocol/openid-connect/certs")
+        NimbusReactiveJwtDecoder jwtDecoder = NimbusReactiveJwtDecoder
+                .withJwkSetUri(
+                    "http://keycloak:8080/realms/master/protocol/openid-connect/certs"
+                )
                 .build();
 
         OAuth2TokenValidator<Jwt> withIssuer = JwtValidators.createDefaultWithIssuer(
-                "http://localhost:8080/realms/master");
+                "http://keycloak:8080/realms/master");
 
         // Skip audience validation (or add custom)
         OAuth2TokenValidator<Jwt> audienceValidator = token -> OAuth2TokenValidatorResult.success();
@@ -52,6 +54,9 @@ public class SecurityConfig {
                 .authorizeExchange(exchanges -> exchanges
                         // Разрешаем preflight-запросы
                         .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                        .pathMatchers("/ws/investments/**").permitAll()
+                        .pathMatchers("/ws/users/**").permitAll()
 
                         // Публичные GET-запросы (если нужно)
                         .pathMatchers(HttpMethod.GET, "/agrichain/investments/**").permitAll()

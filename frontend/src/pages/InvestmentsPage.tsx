@@ -1,22 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { fetchUserDetails } from "../features/user/userSlice";
-import { fetchInvestments, fetchAllInvestments } from "../features/investment/investmentsSlice";
+import { fetchAllInvestments } from "../features/investment/investmentsSlice";
 import { keycloak } from "../features/auth/keycloak";
-import { Box, Typography, Grid, Button, Dialog, DialogTitle, DialogContent, Card, CardContent } from "@mui/material";
 import CreateInvestmentForm from "../components/CreateInvestmentForm";
 import { InvestmentLotsDto } from "../features/investment/investmentTypes";
 import { useTranslation } from "react-i18next";
-
-const appleFont = `"SF Pro Display","SF Pro Icons","Helvetica Neue","Helvetica","Arial",sans-serif`;
+import { useInvestmentsWebSocket } from "../features/investment/useInvestmentsWebSocket";
+import { InvestmentFilters, InvestmentFiltersComponent } from "../components/InvestmentFilters";
 
 const InvestmentCard = ({
-    inv,
-    onBid,
-    onDividends,
-    isFarmer,
-    isOwner
-}: {
+                            inv,
+                            onBid,
+                            onDividends,
+                            isFarmer,
+                            isOwner
+                        }: {
     inv: InvestmentLotsDto;
     onBid?: (id: number) => void;
     onDividends?: (id: number) => void;
@@ -24,64 +23,50 @@ const InvestmentCard = ({
     isOwner: boolean;
 }) => {
     const { t } = useTranslation();
-    
+
     return (
-        <Card
-            variant="outlined"
-            sx={{
-                borderRadius: 3,
-                boxShadow: 3,
-                transition: "transform 0.2s",
-                fontFamily: appleFont,
-                "&:hover": { transform: "translateY(-5px)", boxShadow: 6 },
-            }}
-        >
-            <CardContent>
-                <Typography variant="h6" fontWeight="bold" gutterBottom>
+        <div className="bg-white rounded-2xl shadow-xl border border-green-100 hover:shadow-2xl transition-all duration-200 flex flex-col p-6 min-w-[320px] max-w-[370px] mx-auto">
+            <div className="flex items-center gap-2 mb-2">
+                <span className="inline-block w-2 h-2 rounded-full bg-green-400"></span>
+                <span className="text-lg font-bold text-green-800">
                     {t('investments.cardTitle', { number: inv.investmentNumber })}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                    {t('investments.status')}: {inv.investmentStatus}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                    {t('investments.type')}: {inv.investmentType}
-                </Typography>
-                <Typography variant="body1" fontWeight={500} mt={1}>
-                    {t('investments.amount')}: <strong>{inv.sum} USD</strong>
-                </Typography>
-                <Typography variant="body2" mt={1}>
-                    {t('investments.description')}: {inv.description}
-                </Typography>
-                <Typography variant="body2" mt={1}>
-                    {t('investments.returnConditions')}: {inv.returnConditions}
-                </Typography>
-                <Typography variant="body2" mt={1}>
-                    {t('investments.requirements')}: {inv.requirements}
-                </Typography>
-                {/* Фермер может подать заявку на открытый чужой лот */}
-                {isFarmer && !isOwner && inv.investmentStatus === "OPEN" && (
-                    <Button
-                        fullWidth
-                        variant="contained"
-                        sx={{ mt: 2, borderRadius: 2, fontFamily: appleFont }}
-                        onClick={() => onBid && onBid(inv.investmentNumber)}
-                    >
-                        {t('investments.submitApplication')}
-                    </Button>
-                )}
-                {/* Фермер может выплатить дивиденды по своему лоту */}
-                {isFarmer && isOwner && (
-                    <Button
-                        fullWidth
-                        variant="outlined"
-                        sx={{ mt: 2, borderRadius: 2, fontFamily: appleFont }}
-                        onClick={() => onDividends && onDividends(inv.investmentNumber)}
-                    >
-                        {t('investments.payDividends')}
-                    </Button>
-                )}
-            </CardContent>
-        </Card>
+                </span>
+            </div>
+            <div className="text-sm text-green-700 mb-1">
+                <span className="font-semibold">{t('investments.status')}:</span> {inv.investmentStatus}
+            </div>
+            <div className="text-sm text-green-700 mb-1">
+                <span className="font-semibold">{t('investments.type')}:</span> {inv.investmentType}
+            </div>
+            <div className="text-base font-semibold text-amber-700 mb-2">
+                {t('investments.amount')}: <span className="font-bold">{inv.sum} USD</span>
+            </div>
+            <div className="text-sm text-gray-700 mb-1">
+                <span className="font-semibold">{t('investments.description')}:</span> {inv.description}
+            </div>
+            <div className="text-sm text-gray-700 mb-1">
+                <span className="font-semibold">{t('investments.returnConditions')}:</span> {inv.returnConditions}
+            </div>
+            <div className="text-sm text-gray-700 mb-2">
+                <span className="font-semibold">{t('investments.requirements')}:</span> {inv.requirements}
+            </div>
+            {isFarmer && !isOwner && inv.investmentStatus === "OPEN" && (
+                <button
+                    className="w-full mt-2 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded-xl transition"
+                    onClick={() => onBid && onBid(inv.investmentNumber)}
+                >
+                    {t('investments.submitApplication')}
+                </button>
+            )}
+            {isFarmer && isOwner && (
+                <button
+                    className="w-full mt-2 border border-amber-400 text-amber-700 font-semibold py-2 rounded-xl hover:bg-amber-50 transition"
+                    onClick={() => onDividends && onDividends(inv.investmentNumber)}
+                >
+                    {t('investments.payDividends')}
+                </button>
+            )}
+        </div>
     );
 };
 
@@ -89,11 +74,7 @@ const InvestmentsPage = () => {
     const { t } = useTranslation();
     const dispatch = useAppDispatch();
     const { userInfo, isLoading, error } = useAppSelector((state) => state.reducer.user);
-    const { investmentLots,
-        investmentsApplications,
-        selectedInvestmentApplication,
-        selectedInvestmentLot
-    } = useAppSelector((state) => state.reducer.investment);
+    const { investmentLots } = useAppSelector((state) => state.reducer.investment);
 
     const [openForm, setOpenForm] = useState(false);
 
@@ -101,20 +82,34 @@ const InvestmentsPage = () => {
     const isFarmer = userInfo.accountsDto?.accountType === "FARMERS";
     const myAccount = userInfo.accountsDto?.accountNumber;
 
+    useInvestmentsWebSocket();
+
+    const [filters, setFilters] = useState<InvestmentFilters>({});
+    const [filteredInvestments, setFilteredInvestments] = useState<InvestmentLotsDto[]>([]);
+
+    useEffect(() => {
+        let result = investmentLots;
+        if (filters.type) result = result.filter(i => i.investmentType === filters.type);
+        if (filters.status) result = result.filter(i => i.investmentStatus === filters.status);
+        if (filters.minSum) result = result.filter(i => i.sum >= filters.minSum!);
+        if (filters.maxSum) result = result.filter(i => i.sum <= filters.maxSum!);
+        if (filters.search) result = result.filter(i =>
+            i.description.toLowerCase().includes(filters.search!.toLowerCase())
+        );
+        setFilteredInvestments(result);
+    }, [investmentLots, filters]);
+
     useEffect(() => {
         const mobileNumber = keycloak.tokenParsed?.mobile_number;
         if (mobileNumber) dispatch(fetchUserDetails(mobileNumber));
     }, [dispatch]);
 
     useEffect(() => {
-        if (isInvestor && myAccount) {
-            dispatch(fetchAllInvestments());
-        } else if (isFarmer) {
+        if ((isInvestor && myAccount) || isFarmer) {
             dispatch(fetchAllInvestments());
         }
     }, [dispatch, isInvestor, isFarmer, myAccount, keycloak]);
 
-    // Для фермера показываем только открытые и не свои лоты для подачи заявки
     let visibleInvestments = investmentLots;
     if (isFarmer && myAccount) {
         visibleInvestments = investmentLots.filter(
@@ -130,65 +125,61 @@ const InvestmentsPage = () => {
         alert(t('investments.dividendsInitiated', { number: investmentNumber }));
     };
 
-    if (isLoading) return <Typography>{t('common.loading')}</Typography>;
-    if (error) return <Typography color="error">{error}</Typography>;
+    if (isLoading) return <div className="text-center text-green-700 text-lg">{t('common.loading')}</div>;
+    if (error) return <div className="text-center text-red-600">{error}</div>;
 
     return (
-        <Box sx={{ p: 3, fontFamily: appleFont }}>
-            <Typography
-                variant="h4"
-                align="center"
-                gutterBottom
-                sx={{ fontFamily: appleFont, fontWeight: 700, mb: 4 }}
-            >
-                {isInvestor ? t('investments.myInvestmentLots') : t('investments.availableLotsForApplication')}
-            </Typography>
-            {isInvestor && (
-                <>
-                    <Box display="flex" justifyContent="center" mb={3}>
-                        <Button
-                            variant="contained"
-                            color="success"
-                            sx={{
-                                borderRadius: 3,
-                                fontWeight: 600,
-                                fontFamily: appleFont,
-                                fontSize: 16,
-                                textTransform: "none",
-                                boxShadow: 2,
-                            }}
-                            onClick={() => setOpenForm(true)}
-                        >
-                            {t('investments.createLot')}
-                        </Button>
-                    </Box>
-                    <Dialog sx={{ fontFamily: appleFont, fontWeight: 700, borderRadius: 30}} open={openForm} onClose={() => setOpenForm(false)} maxWidth="sm" fullWidth>
-                        <DialogContent>
-                            <CreateInvestmentForm />
-                        </DialogContent>
-                    </Dialog>
-                </>
-            )}
-            {visibleInvestments.length === 0 ? (
-                <Typography color="text.secondary" align="center">
-                    {t('investments.noLots')}
-                </Typography>
-            ) : (
-                <Grid container spacing={3} justifyContent="center">
-                    {visibleInvestments.map((inv: InvestmentLotsDto) => (
-                        <Grid key={inv.investmentNumber}>
+        <div className="min-h-screen bg-gradient-to-br from-green-50 via-lime-50 to-amber-50 py-8 px-2">
+            <div className="max-w-5xl mx-auto">
+                <h1 className="text-3xl md:text-4xl font-extrabold text-green-900 text-center mb-6 drop-shadow-sm">
+                    {isInvestor ? t('investments.myInvestmentLots') : t('investments.availableLotsForApplication')}
+                </h1>
+                <InvestmentFiltersComponent filters={filters} setFilters={setFilters} onReset={() => setFilters({})} />
+                {isInvestor && (
+                    <>
+                        <div className="flex justify-center mb-6">
+                            <button
+                                className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-2xl shadow-lg transition text-lg"
+                                onClick={() => setOpenForm(true)}
+                            >
+                                {t('investments.createLot')}
+                            </button>
+                        </div>
+                        {openForm && (
+                            <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+                                <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-lg w-full relative">
+                                    <button
+                                        className="absolute top-3 right-3 text-gray-400 hover:text-green-600 text-2xl"
+                                        onClick={() => setOpenForm(false)}
+                                    >
+                                        &times;
+                                    </button>
+                                    <CreateInvestmentForm />
+                                </div>
+                            </div>
+                        )}
+                    </>
+                )}
+                {visibleInvestments.length === 0 ? (
+                    <div className="text-center text-gray-500 mt-10 text-lg">
+                        {t('investments.noLots')}
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-7 mt-6">
+                        {filteredInvestments.map((inv: InvestmentLotsDto) => (
                             <InvestmentCard
+                                key={inv.investmentNumber}
                                 inv={inv}
                                 onBid={handleBid}
                                 onDividends={handleDividends}
                                 isFarmer={isFarmer}
                                 isOwner={inv.accountNumber === myAccount}
                             />
-                        </Grid>
-                    ))}
-                </Grid>
-            )}
-        </Box>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </div>
     );
 };
 

@@ -3,6 +3,7 @@ package com.agriculturalmarket.users.dto.investments;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -23,8 +24,8 @@ public class InvestmentLotsDto {
 
     private String documentsUrl;
 
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime deadline;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate deadline;
 
     private ConfirmationType confirmationType;
 

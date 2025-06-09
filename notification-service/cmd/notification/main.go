@@ -128,7 +128,21 @@ func startConsumer(ctx context.Context, kh *handler.KafkaHandler, cfg config.Con
 func startHTTPServer(port int, router http.Handler, logger *zap.Logger) {
 	addr := fmt.Sprintf(":%d", port)
 	logger.Info("Starting HTTP server", zap.Int("port", port))
-	if err := http.ListenAndServe(addr, router); err != nil {
+
+	if err := http.ListenAndServe(addr, corsMiddleware(router)); err != nil {
 		logger.Fatal("Failed to start HTTP server", zap.Error(err))
 	}
+}
+
+func corsMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
 }

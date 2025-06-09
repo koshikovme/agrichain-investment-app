@@ -141,7 +141,16 @@
     "terms": "Пайдалану шарттары"
   },
   "investments": {
-    "cardTitle": "Инвестиция №{{number}}",
+    "noApplications": "Инвестициялық лоттарға өтінімдер жоқ",
+    "viewApplications": "Өтінімдерді қарау",
+    "applicationsForLot": "№{{number}} лотқа өтінімдер",
+    "farmerId": "Фермер ID",
+    "proposalText": "Ұсыныс мәтіні",
+    "sendApplicationForLot": "Лотқа өтінім жіберу",
+    "expectedProfit": "Күтілетін табыс",
+    "proposalText": "Инвестициялық лот бойынша сіздің ұсынысыңыз",
+    "confirmed": "Расталған",
+    "cardTitle": "Инвестиция №",
     "status": "Статус",
     "type": "Түрі",
     "amount": "Сома",
@@ -182,6 +191,11 @@
     "noUserData": "Пайдаланушы деректері табылмады."
   },
   "admin": {
+    "noApplications": "Инвестициялық лоттарға өтінімдер жоқ",
+    "investmentLots": "Инвестициялық лоттар",
+    "allInvestmentLots": "Барлық инвестициялық лоттар",
+    "actions": "Әрекеттер",
+    "confirm": "Лотты мақұлдау",
     "dashboard": "Әкімші панелі",
     "welcome": "Қош келдіңіз",
     "notifications": "Хабарламалар",

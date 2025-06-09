@@ -16,8 +16,7 @@ public class InvestmentsWebSocketSender {
     private final SimpMessagingTemplate messagingTemplate;
     private final InvestmentsService investmentsService;
 
-    // Периодически отправлять все инвестиции всем подписчикам
-    @Scheduled(fixedRate = 5000) // каждые 5 секунд
+    @Scheduled(fixedRate = 5000)
     public void sendAllInvestments() {
         List<InvestmentLotsDto> allInvestments = investmentsService.fetchAllInvestmentLots("temp_bootleneck_correlation_id");
         messagingTemplate.convertAndSend("/topic/investments", allInvestments);

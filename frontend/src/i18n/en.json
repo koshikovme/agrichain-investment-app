@@ -141,7 +141,16 @@
     "terms": "Terms of Use"
   },
   "investments": {
-    "cardTitle": "Investment №{{number}}",
+    "noApplications": "No applications for investment lots",
+    "viewApplications": "View applications",
+    "applicationsForLot": "Applications for lot №{{number}}",
+    "farmerId": "Farmer ID",
+    "proposalText": "Proposal",
+    "sendApplicationForLot": "Send application for lot",
+    "expectedProfit": "Expected profit",
+    "proposalText": "Your proposal for investment lot",
+    "confirmed": "Confirmed",
+    "cardTitle": "Investment №",
     "status": "Status",
     "type": "Type",
     "amount": "Amount",
@@ -182,6 +191,11 @@
     "noUserData": "No user data found."
   },
   "admin": {
+    "noApplications": "No applications for investment lots",
+    "investmentLots": "Investment Lots",
+    "allInvestmentLots": "All Investment Lots",
+    "actions": "Actions",
+    "confirm": "Confirm lot",
     "dashboard": "Admin Dashboard",
     "welcome": "Welcome",
     "notifications": "Notifications",

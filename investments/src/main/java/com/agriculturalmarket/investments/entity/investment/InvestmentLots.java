@@ -5,7 +5,7 @@ import com.agriculturalmarket.investments.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity(name = "investment_lots")
 @Getter
@@ -36,7 +36,7 @@ public class InvestmentLots extends BaseEntity {
     private String requirements;
 
     @Column(name = "deadline")
-    private LocalDateTime deadline;
+    private LocalDate deadline;
 
     @Column(name = "amount")
     private Long amount;

@@ -9,15 +9,32 @@ services:
       KEYCLOAK_ADMIN_PASSWORD: admin
     command:
       - start-dev
-      - --hostname=https://auth-agrichain.eu.ngrok.io
+      - --hostname=keycloak
       - --hostname-strict=false
-      - --hostname-admin=https://auth-agrichain.eu.ngrok.io
     restart: unless-stopped
-    depends_on:
-      - postgres
     extends:
       file: common-config.yml
       service: microservice-base-config
+
+#  keycloak:
+#    image: koshikov1/agrichain-keycloak:latest
+#    container_name: keycloak
+#    ports:
+#      - "8080:8080"
+#    environment:
+#      KEYCLOAK_ADMIN: admin
+#      KEYCLOAK_ADMIN_PASSWORD: admin
+#    command:
+#      - start-dev
+#      - --hostname=https://auth-agrichain.eu.ngrok.io
+#      - --hostname-strict=false
+#      - --hostname-admin=https://auth-agrichain.eu.ngrok.io
+#    restart: unless-stopped
+#    depends_on:
+#      - postgres
+#    extends:
+#      file: common-config.yml
+#      service: microservice-base-config
 
   ngrok:
     image: wernight/ngrok

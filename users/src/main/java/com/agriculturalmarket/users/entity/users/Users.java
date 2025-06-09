@@ -2,7 +2,6 @@ package com.agriculturalmarket.users.entity.users;
 
 
 import com.agriculturalmarket.users.entity.BaseEntity;
-import com.agriculturalmarket.users.entity.Role;
 import jakarta.persistence.*;
 import lombok.*;
 

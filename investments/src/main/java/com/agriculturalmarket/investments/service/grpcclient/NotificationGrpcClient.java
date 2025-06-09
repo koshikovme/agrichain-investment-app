@@ -13,11 +13,11 @@ public class NotificationGrpcClient {
     private final NotificationServiceGrpc.NotificationServiceBlockingStub stub;
 
     public NotificationGrpcClient(
-            @Value("${grpc.payment.host:localhost}") String host,
+            @Value("${grpc.payment.host:}") String host,
             @Value("${grpc.payment.port:50000}") int port
     ) {
         ManagedChannel channel = ManagedChannelBuilder
-                .forAddress(host, port)
+                .forAddress("localhost", 50000)
                 .usePlaintext()
                 .build();
 

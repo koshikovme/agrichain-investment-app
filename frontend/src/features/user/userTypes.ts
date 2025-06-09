@@ -25,6 +25,7 @@ export interface UserInfo {
     userInfo: UserInfo;
     isLoading: boolean;
     error: string | null;
+    usersList: UsersDto[];
  }
 
 

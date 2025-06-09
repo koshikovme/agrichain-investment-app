@@ -41,6 +41,23 @@ export const publishInvestmentLot = createAsyncThunk(
     }
 );
 
+export const createInvestmentApplication = createAsyncThunk(
+    'investment/createInvestmentApplication',
+    async (application: InvestmentApplicationDto, { rejectWithValue }) => {
+        try {
+            const response = await axios.post(`${API_URL}/apply-investment`, application, {
+                headers: {
+                    Authorization: `Bearer ${keycloak.token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+            return response.data;
+        } catch (error) {
+            return rejectWithValue('Failed to create investment application');
+        }
+    }
+);
+
 // Получить один лот
 export const fetchInvestment = createAsyncThunk(
     'investment/fetchInvestment',
@@ -145,11 +162,20 @@ export const fetchAllInvestmentApplications = createAsyncThunk(
 );
 
 // Обновить лот
-export const updateInvestment = createAsyncThunk(
-    'investment/updateInvestment',
+export const updateInvestmentLot = createAsyncThunk(
+    'investment/updateInvestmentLot',
     async (investment: InvestmentLotsDto, { rejectWithValue }) => {
         try {
-            await axios.post(`${API_URL}/update-investment`, investment);
+            await axios.post(
+                `${API_URL}/update-investment-lot`,
+                investment,
+                {
+                    headers: {
+                        Authorization: `Bearer ${keycloak.token}`,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            );
             return investment;
         } catch (error) {
             return rejectWithValue('Failed to update investment');

@@ -141,7 +141,12 @@
     "terms": "Условия использования"
   },
   "investments": {
-    "cardTitle": "Инвестиция №{{number}}",
+    "noApplications": "Нет заявок на лоты",
+    "viewApplications": "Просмотреть заявки",
+    "sendApplicationForLot": "Отправить заявку на лот",
+    "expectedProfit": "Ожидаемая прибыль",
+    "proposalText": "Ваше предложение по инвестиционному лоту",
+    "cardTitle": "Инвестиция №",
     "status": "Статус",
     "type": "Тип",
     "amount": "Сумма",
@@ -182,6 +187,15 @@
     "noUserData": "Данные пользователя не найдены."
   },
   "admin": {
+    "noApplications": "Нет заявок на лоты",
+    "applicationsForLot": "Заявки на лот №{{number}}",
+    "farmerId": "ID фермера",
+    "proposalText": "Предложение",
+    "confirmed": "Подтверждено",
+    "investmentLots": "Инвестиционные лоты",
+    "allInvestmentLots": "Все инвестиционные лоты",
+    "actions": "Действия",
+    "confirm": "Согласовать лот",
     "dashboard": "Панель администратора",
     "welcome": "Добро пожаловать",
     "notifications": "Уведомления",

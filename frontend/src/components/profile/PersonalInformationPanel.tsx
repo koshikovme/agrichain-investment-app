@@ -37,7 +37,6 @@ import {InvestmentApplicationDto, InvestmentLotsDto } from "../../features/inves
 import {useInvestmentsWebSocket} from "../../features/investment/useInvestmentsWebSocket";
 import {fetchInvestmentLotApplications, updateInvestmentLot} from "../../features/investment/investmentsSlice";
 import InvestmentApplicationsModal from "../investments/InvestmentApplicationsModal";
-
 // Admin interfaces
 interface NotificationDto {
     id: string;
@@ -283,54 +282,102 @@ const PersonalInformationPanel: FC = () => {
         return (
             <Box
                 sx={{
-                    px: 3,
+                    px: 4,
                     py: 5,
                     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-                    background: "linear-gradient(90deg, #e3f2fd 0%, #f3e5f5 100%)",
-                    minHeight: "100vh"
+                    background: "linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 50%, #fff8e1 100%)",
+                    minHeight: "100vh",
+                    position: "relative",
+                    "&::before": {
+                        content: '""',
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundImage: "radial-gradient(circle at 25% 25%, rgba(33, 150, 243, 0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(156, 39, 176, 0.1) 0%, transparent 50%)",
+                        pointerEvents: "none"
+                    }
                 }}
             >
                 <Card
                     sx={{
                         maxWidth: 1200,
                         mx: "auto",
-                        p: 4,
-                        borderRadius: 4,
-                        boxShadow: 4,
-                        border: "2px solid #2196f3",
-                        background: "linear-gradient(135deg, #e8eaf6 80%, #f3e5f5 100%)"
+                        my: 2,
+                        p: 5,
+                        borderRadius: 6,
+                        boxShadow: "0 20px 40px rgba(0,0,0,0.1), 0 8px 16px rgba(0,0,0,0.06)",
+                        border: "1px solid rgba(33, 150, 243, 0.2)",
+                        background: "linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)",
+                        backdropFilter: "blur(10px)",
+                        position: "relative",
+                        overflow: "hidden"
                     }}
                 >
                     <Box display="flex" alignItems="center" gap={3} mb={3}>
                         <Avatar
                             sx={{
-                                width: 100,
-                                height: 100,
-                                bgcolor: "#e3f2fd",
-                                border: "3px solid #2196f3"
+                                width: 120,
+                                height: 120,
+                                bgcolor: "linear-gradient(135deg, #e3f2fd, #f3e5f5)",
+                                border: "4px solid",
+                                borderImage: "linear-gradient(45deg, #2196f3, #9c27b0) 1",
+                                boxShadow: "0 8px 24px rgba(33, 150, 243, 0.3)",
+                                transition: "transform 0.3s ease",
+                                "&:hover": {
+                                    transform: "scale(1.05)"
+                                }
                             }}
                         >
-                            <AdminPanelSettingsIcon sx={{ fontSize: 60, color: "#2196f3" }} />
+                            <AdminPanelSettingsIcon sx={{ fontSize: 70, color: "#2196f3" }} />
                         </Avatar>
                         <Box>
-                            <Typography variant="h4" fontWeight={700} color="#1976d2">
+                            <Typography variant="h3" fontWeight={800} 
+                                sx={{
+                                    background: "linear-gradient(45deg, #1976d2, #9c27b0)",
+                                    backgroundClip: "text",
+                                    WebkitBackgroundClip: "text",
+                                    WebkitTextFillColor: "transparent",
+                                    mb: 1
+                                }}
+                            >
                                 🛡️ {t('admin.dashboard')}
                             </Typography>
-                            <Typography variant="h6" color="text.secondary">
+                            <Typography variant="h6" color="text.secondary" fontWeight={500}>
                                 {t('admin.welcome')}, {userInfo.name}
                             </Typography>
-                            <Typography variant="subtitle2" color="text.secondary">
+                            <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 0.5 }}>
                                 {userInfo.email} | 📱 {userInfo.mobileNumber}
                             </Typography>
                         </Box>
                     </Box>
 
-                    <Divider sx={{ my: 3, borderColor: "#bbdefb" }} />
+                    <Divider sx={{ my: 4, borderColor: "rgba(33, 150, 243, 0.2)", borderWidth: "2px" }} />
 
                     <Tabs
                         value={adminTab}
                         onChange={(e, newValue) => setAdminTab(newValue)}
-                        sx={{ mb: 3 }}
+                        sx={{ 
+                            mb: 4,
+                            "& .MuiTab-root": {
+                                fontWeight: 600,
+                                fontSize: "1rem",
+                                textTransform: "none",
+                                borderRadius: "12px 12px 0 0",
+                                mx: 0.5,
+                                transition: "all 0.3s ease",
+                                "&:hover": {
+                                    backgroundColor: "rgba(33, 150, 243, 0.08)",
+                                    transform: "translateY(-2px)"
+                                }
+                            },
+                            "& .MuiTabs-indicator": {
+                                height: 4,
+                                borderRadius: "4px 4px 0 0",
+                                background: "linear-gradient(90deg, #2196f3, #9c27b0)"
+                            }
+                        }}
                     >
                         <Tab 
                             icon={<NotificationsIcon />} 
@@ -357,12 +404,26 @@ const PersonalInformationPanel: FC = () => {
                     {/* Email Notifications Tab */}
                     {adminTab === 0 && (
                         <Box>
-                            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                                <Typography variant="h6" color="#1976d2">
+                            <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+                                <Typography variant="h5" fontWeight={700}
+                                    sx={{
+                                        background: "linear-gradient(45deg, #1976d2, #2196f3)",
+                                        backgroundClip: "text",
+                                        WebkitBackgroundClip: "text",
+                                        WebkitTextFillColor: "transparent"
+                                    }}
+                                >
                                     📧 {t('admin.emailNotificationsList')}
                                 </Typography>
-                                <IconButton onClick={() => fetchEmailNotifications(emailNotificationPage)} color="primary">
-                                    <RefreshIcon />
+                                <IconButton 
+                                    onClick={() => fetchEmailNotifications(emailNotificationPage)} 
+                                    sx={{
+                                        bgcolor: "rgba(33, 150, 243, 0.1)",
+                                        "&:hover": { bgcolor: "rgba(33, 150, 243, 0.2)", transform: "rotate(180deg)" },
+                                        transition: "all 0.3s ease"
+                                    }}
+                                >
+                                    <RefreshIcon color="primary" />
                                 </IconButton>
                             </Box>
                             
@@ -372,10 +433,23 @@ const PersonalInformationPanel: FC = () => {
                                 </Box>
                             ) : (
                                 <>
-                                    <TableContainer component={Paper} sx={{ mb: 2 }}>
+                                    <TableContainer component={Paper} sx={{ 
+                                        mb: 3, 
+                                        borderRadius: 4,
+                                        boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
+                                        overflow: "hidden"
+                                    }}>
                                         <Table>
                                             <TableHead>
-                                                <TableRow sx={{ bgcolor: "#e3f2fd" }}>
+                                                <TableRow sx={{ 
+                                                    background: "linear-gradient(135deg, #e3f2fd, #f3e5f5)",
+                                                    "& th": { 
+                                                        fontWeight: 700, 
+                                                        fontSize: "1rem",
+                                                        color: "#1976d2",
+                                                        borderBottom: "2px solid rgba(33, 150, 243, 0.2)"
+                                                    }
+                                                }}>
                                                     <TableCell sx={{ fontWeight: 700 }}>{t('admin.message')}</TableCell>
                                                     <TableCell sx={{ fontWeight: 700 }}>{t('admin.type')}</TableCell>
                                                     <TableCell sx={{ fontWeight: 700 }}>{t('admin.email')}</TableCell>
@@ -386,7 +460,18 @@ const PersonalInformationPanel: FC = () => {
                                             <TableBody>
                                                 {emailNotifications?.data.notifications?.length != null && emailNotifications?.data.notifications?.length > 0 ? (
                                                     emailNotifications?.data.notifications?.map((notification, index) => (
-                                                        <TableRow key={`email-${notification.UserID}-${index}`}>
+                                                        <TableRow key={`email-${notification.UserID}-${index}`}
+                                                            sx={{
+                                                                "&:hover": { 
+                                                                    backgroundColor: "rgba(33, 150, 243, 0.04)",
+                                                                    transform: "scale(1.01)"
+                                                                },
+                                                                transition: "all 0.2s ease",
+                                                                "&:nth-of-type(even)": {
+                                                                    backgroundColor: "rgba(0,0,0,0.02)"
+                                                                }
+                                                            }}
+                                                        >
                                                             <TableCell>{getMessageFromMetadata(notification.Metadata)}</TableCell>
                                                             <TableCell>
                                                                 <Chip
@@ -397,7 +482,7 @@ const PersonalInformationPanel: FC = () => {
                                                             </TableCell>
                                                             <TableCell>{notification.Email}</TableCell>
                                                             <TableCell>{notification.Name}</TableCell>
-                                                            {/*<TableCell>{formatDate(notification.)}</TableCell>*/}
+                                                            <TableCell>{formatDate(notification.CreatedAt)}</TableCell>
                                                         </TableRow>
                                                     ))
                                                 ) : (
@@ -429,12 +514,26 @@ const PersonalInformationPanel: FC = () => {
                     {/* Web Notifications Tab */}
                     {adminTab === 1 && (
                         <Box>
-                            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                                <Typography variant="h6" color="#1976d2">
+                            <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+                                <Typography variant="h5" fontWeight={700}
+                                    sx={{
+                                        background: "linear-gradient(45deg, #1976d2, #2196f3)",
+                                        backgroundClip: "text",
+                                        WebkitBackgroundClip: "text",
+                                        WebkitTextFillColor: "transparent"
+                                    }}
+                                >
                                     🌐 {t('admin.webNotificationsList')}
                                 </Typography>
-                                <IconButton onClick={() => fetchWebNotifications(webNotificationPage)} color="primary">
-                                    <RefreshIcon />
+                                <IconButton 
+                                    onClick={() => fetchWebNotifications(webNotificationPage)} 
+                                    sx={{
+                                        bgcolor: "rgba(33, 150, 243, 0.1)",
+                                        "&:hover": { bgcolor: "rgba(33, 150, 243, 0.2)", transform: "rotate(180deg)" },
+                                        transition: "all 0.3s ease"
+                                    }}
+                                >
+                                    <RefreshIcon color="primary" />
                                 </IconButton>
                             </Box>
                             
@@ -444,10 +543,23 @@ const PersonalInformationPanel: FC = () => {
                                 </Box>
                             ) : (
                                 <>
-                                    <TableContainer component={Paper} sx={{ mb: 2 }}>
+                                    <TableContainer component={Paper} sx={{ 
+                                        mb: 3, 
+                                        borderRadius: 4,
+                                        boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
+                                        overflow: "hidden"
+                                    }}>
                                         <Table>
                                             <TableHead>
-                                                <TableRow sx={{ bgcolor: "#e3f2fd" }}>
+                                                <TableRow sx={{ 
+                                                    background: "linear-gradient(135deg, #e3f2fd, #f3e5f5)",
+                                                    "& th": { 
+                                                        fontWeight: 700, 
+                                                        fontSize: "1rem",
+                                                        color: "#1976d2",
+                                                        borderBottom: "2px solid rgba(33, 150, 243, 0.2)"
+                                                    }
+                                                }}>
                                                     <TableCell sx={{ fontWeight: 700 }}>{t('admin.message')}</TableCell>
                                                     <TableCell sx={{ fontWeight: 700 }}>{t('admin.type')}</TableCell>
                                                     <TableCell sx={{ fontWeight: 700 }}>{t('admin.status')}</TableCell>
@@ -476,7 +588,7 @@ const PersonalInformationPanel: FC = () => {
                                                         </TableCell>
                                                         <TableCell>{notification.Email}</TableCell>
                                                         <TableCell>{notification.Name}</TableCell>
-                                                        {/*<TableCell>{formatDate(notification.createdAt)}</TableCell>*/}
+                                                        <TableCell>{formatDate(notification.CreatedAt)}</TableCell>
                                                     </TableRow>
                                                 ))}
                                             </TableBody>
@@ -501,12 +613,25 @@ const PersonalInformationPanel: FC = () => {
                     {/* Users Tab */}
                     {adminTab === 2 && (
                         <Box>
-                            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                                <Typography variant="h6" color="#1976d2">
+                            <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+                                <Typography variant="h5" fontWeight={700}
+                                    sx={{
+                                        background: "linear-gradient(45deg, #1976d2, #2196f3)",
+                                        backgroundClip: "text",
+                                        WebkitBackgroundClip: "text",
+                                        WebkitTextFillColor: "transparent"
+                                    }}
+                                >
                                     👥 {t('admin.usersList')}
                                 </Typography>
-                                <IconButton color="primary">
-                                    <RefreshIcon />
+                                <IconButton 
+                                    sx={{
+                                        bgcolor: "rgba(33, 150, 243, 0.1)",
+                                        "&:hover": { bgcolor: "rgba(33, 150, 243, 0.2)", transform: "rotate(180deg)" },
+                                        transition: "all 0.3s ease"
+                                    }}
+                                >
+                                    <RefreshIcon color="primary" />
                                 </IconButton>
                             </Box>
                             
@@ -516,10 +641,23 @@ const PersonalInformationPanel: FC = () => {
                                 </Box>
                             ) : (
                                 <>
-                                    <TableContainer component={Paper} sx={{ mb: 2 }}>
+                                    <TableContainer component={Paper} sx={{ 
+                                        mb: 3, 
+                                        borderRadius: 4,
+                                        boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
+                                        overflow: "hidden"
+                                    }}>
                                         <Table>
                                             <TableHead>
-                                                <TableRow sx={{ bgcolor: "#e3f2fd" }}>
+                                                <TableRow sx={{ 
+                                                    background: "linear-gradient(135deg, #e3f2fd, #f3e5f5)",
+                                                    "& th": { 
+                                                        fontWeight: 700, 
+                                                        fontSize: "1rem",
+                                                        color: "#1976d2",
+                                                        borderBottom: "2px solid rgba(33, 150, 243, 0.2)"
+                                                    }
+                                                }}>
                                                     <TableCell sx={{ fontWeight: 700 }}>{t('admin.name')}</TableCell>
                                                     <TableCell sx={{ fontWeight: 700 }}>{t('admin.email')}</TableCell>
                                                     <TableCell sx={{ fontWeight: 700 }}>{t('admin.phone')}</TableCell>
@@ -573,10 +711,22 @@ const PersonalInformationPanel: FC = () => {
 
                     {adminTab === 3 && (
                         <Box>
-                            <Typography variant="h6" color="#1976d2" mb={2}>
+                            <Typography variant="h5" fontWeight={700} mb={3}
+                                sx={{
+                                    background: "linear-gradient(45deg, #1976d2, #2196f3)",
+                                    backgroundClip: "text",
+                                    WebkitBackgroundClip: "text",
+                                    WebkitTextFillColor: "transparent"
+                                }}
+                            >
                                 🌱 {t('admin.allInvestmentLots')}
                             </Typography>
-                            <TableContainer component={Paper} sx={{ mb: 2 }}>
+                            <TableContainer component={Paper} sx={{ 
+                                mb: 3, 
+                                borderRadius: 4,
+                                boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
+                                overflow: "hidden"
+                            }}>
                                 <Table>
                                     <TableHead>
                                         <TableRow sx={{ bgcolor: "#e3f2fd" }}>
@@ -590,7 +740,20 @@ const PersonalInformationPanel: FC = () => {
                                     </TableHead>
                                     <TableBody>
                                         {investmentLots.map((lot) => (
-                                            <TableRow key={lot.investmentNumber} onClick={() => handleOpenApplications(lot.investmentNumber)} style={{ cursor: "pointer" }}>
+                                            <TableRow key={lot.investmentNumber} 
+                                                onClick={() => handleOpenApplications(lot.investmentNumber)} 
+                                                sx={{
+                                                    cursor: "pointer",
+                                                    "&:hover": { 
+                                                        backgroundColor: "rgba(76, 175, 80, 0.08)",
+                                                        transform: "scale(1.01)"
+                                                    },
+                                                    transition: "all 0.2s ease",
+                                                    "&:nth-of-type(even)": {
+                                                        backgroundColor: "rgba(0,0,0,0.02)"
+                                                    }
+                                                }}
+                                            >
                                                 <TableCell>#{lot.investmentNumber}</TableCell>
                                                 <TableCell>{lot.investmentStatus}</TableCell>
                                                 <TableCell>{lot.investmentType}</TableCell>
@@ -599,19 +762,31 @@ const PersonalInformationPanel: FC = () => {
                                                 <TableCell>
                                                     {confirmedLotId === lot.investmentNumber || lot.investmentStatus === "OPEN" ? (
                                                         <Typography color="success.main" fontWeight={600}>
-                                                            {t('admin.confirmed')}
+                                                            ✅ {t('admin.confirmed')}
                                                         </Typography>
                                                     ) : (
                                                         <Button
                                                             variant="contained"
-                                                            color="success"
                                                             size="small"
                                                             onClick={() => handleConfirmLot(lot)}
+                                                            sx={{
+                                                                background: "linear-gradient(45deg, #4caf50, #81c784)",
+                                                                borderRadius: 3,
+                                                                textTransform: "none",
+                                                                fontWeight: 600,
+                                                                boxShadow: "0 4px 12px rgba(76, 175, 80, 0.3)",
+                                                                "&:hover": {
+                                                                    background: "linear-gradient(45deg, #388e3c, #66bb6a)",
+                                                                    transform: "translateY(-2px)",
+                                                                    boxShadow: "0 6px 16px rgba(76, 175, 80, 0.4)"
+                                                                }
+                                                            }}
                                                         >
                                                             {t('admin.confirm')}
                                                         </Button>
                                                     )}
                                                 </TableCell>
+                                                {/* <TableCell>{lot.createdAt}</TableCell> */}
                                                 <InvestmentApplicationsModal
                                                     open={openApplicationsModal}
                                                     onClose={() => setOpenApplicationsModal(false)}
@@ -634,56 +809,94 @@ const PersonalInformationPanel: FC = () => {
     return (
         <Box
             sx={{
+                px: 4,
                 py: 5,
                 fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-                background: "linear-gradient(90deg, #e8f5e9 0%, #fffde7 100%)",
-                minHeight: "100vh"
+                background: "linear-gradient(135deg, #e8f5e9 0%, #fffde7 50%, #f3e5f5 100%)",
+                minHeight: "100vh",
+                position: "relative",
+                "&::before": {
+                    content: '""',
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundImage: "radial-gradient(circle at 20% 80%, rgba(76, 175, 80, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255, 193, 7, 0.1) 0%, transparent 50%)",
+                    pointerEvents: "none"
+                }
             }}
         >
             <Card
                 sx={{
-                    maxWidth: 800,
+                    maxWidth: 900,
                     mx: "auto",
-                    p: 4,
-                    borderRadius: 4,
-                    boxShadow: 4,
-                    border: "2px solid #4caf50",
-                    background: "linear-gradient(135deg, #f1f8e9 80%, #fffde7 100%)"
+                    my: 2,
+                    p: 5,
+                    borderRadius: 6,
+                    boxShadow: "0 20px 40px rgba(0,0,0,0.1), 0 8px 16px rgba(0,0,0,0.06)",
+                    border: "1px solid rgba(76, 175, 80, 0.2)",
+                    background: "linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)",
+                    backdropFilter: "blur(10px)",
+                    position: "relative",
+                    overflow: "hidden"
                 }}
             >
-                <Box display="flex" alignItems="center" gap={3} mb={3}>
+                <Box display="flex" alignItems="center" gap={4} mb={4}>
                     <Avatar
                         src={userInfo.image || '/images/profile2.png'}
                         alt={userInfo.name}
                         sx={{
-                            width: 100,
-                            height: 100,
+                            width: 120,
+                            height: 120,
                             bgcolor: "#e8f5e9",
-                            border: "3px solid #4caf50"
+                            boxShadow: "0 8px 24px rgba(76, 175, 80, 0.3)",
+                            transition: "transform 0.3s ease",
+                            "&:hover": {
+                                transform: "scale(1.05)"
+                            }
                         }}
                     >
-                        <AgricultureIcon sx={{ fontSize: 60, color: "#4caf50" }} />
+                        <AgricultureIcon sx={{ fontSize: 70, color: "#4caf50" }} />
                     </Avatar>
                     <Box>
-                        <Typography variant="h5" fontWeight={700} color="#2e7d32">
+                        <Typography variant="h4" fontWeight={800} 
+                            sx={{
+                                background: "linear-gradient(45deg, #2e7d32, #4caf50)",
+                                backgroundClip: "text",
+                                WebkitBackgroundClip: "text",
+                                WebkitTextFillColor: "transparent",
+                                mb: 1
+                            }}
+                        >
                             {userInfo.name} - {userInfo.firstName} {userInfo.lastName}
                         </Typography>
-                        <Typography variant="subtitle1" color="text.secondary">
+                        <Typography variant="h6" color="text.secondary" fontWeight={500}>
                             {userInfo.email}
                         </Typography>
-                        <Typography variant="subtitle2" color="text.secondary">
+                        <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 0.5 }}>
                             📱 {userInfo.mobileNumber}
                         </Typography>
                         <Button
                             onClick={() => setModalOpen(true)}
                             variant="outlined"
                             sx={{
-                                mt: 2,
-                                borderRadius: 2,
+                                mt: 3,
+                                borderRadius: 3,
                                 borderColor: "#4caf50",
                                 color: "#388e3c",
                                 fontWeight: 600,
-                                "&:hover": { borderColor: "#388e3c", background: "#e8f5e9" }
+                                textTransform: "none",
+                                px: 3,
+                                py: 1,
+                                background: "linear-gradient(45deg, rgba(76, 175, 80, 0.05), rgba(255, 193, 7, 0.05))",
+                                "&:hover": { 
+                                    borderColor: "#388e3c", 
+                                    background: "linear-gradient(45deg, rgba(76, 175, 80, 0.1), rgba(255, 193, 7, 0.1))",
+                                    transform: "translateY(-2px)",
+                                    boxShadow: "0 4px 12px rgba(76, 175, 80, 0.3)"
+                                },
+                                transition: "all 0.3s ease"
                             }}
                         >
                             ✏️ {t('personal.editProfile')}
@@ -692,30 +905,37 @@ const PersonalInformationPanel: FC = () => {
                     </Box>
                 </Box>
 
-                <Divider sx={{ my: 2, borderColor: "#c8e6c9" }} />
+                <Divider sx={{ my: 4, borderColor: "rgba(76, 175, 80, 0.2)", borderWidth: "2px" }} />
 
-                <Grid container spacing={2} mb={2}>
+                <Grid container spacing={4} mb={4}>
                     <Grid>
-                        <Typography variant="subtitle2" color="text.secondary">
+                        <Typography variant="subtitle2" color="text.secondary" fontWeight={600}>
                             {t('personal.profileNumber')}
                         </Typography>
-                        <Typography fontWeight={600} color="#2e7d32">
+                        <Typography variant="h6" fontWeight={700} color="#2e7d32">
                             {userInfo.accountsDto?.accountNumber}
                         </Typography>
                     </Grid>
                     <Grid>
-                        <Typography variant="subtitle2" color="text.secondary">
+                        <Typography variant="subtitle2" color="text.secondary" fontWeight={600}>
                             {t('personal.accountType')}
                         </Typography>
-                        <Typography fontWeight={600} color="#2e7d32">
+                        <Typography variant="h6" fontWeight={700} color="#2e7d32">
                             {userInfo.accountsDto?.accountType}
                         </Typography>
                     </Grid>
                 </Grid>
 
-                <Divider sx={{ my: 3, borderColor: "#c8e6c9" }} />
+                <Divider sx={{ my: 4, borderColor: "rgba(76, 175, 80, 0.2)", borderWidth: "2px" }} />
 
-                <Typography variant="h6" mb={2} color="#388e3c">
+                <Typography variant="h5" mb={3} fontWeight={700}
+                    sx={{
+                        background: "linear-gradient(45deg, #388e3c, #4caf50)",
+                        backgroundClip: "text",
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent"
+                    }}
+                >
                     🌱 {t('personal.myInvestments')}
                 </Typography>
                 {userInfo.investmentsLots && userInfo.investmentsLots.length > 0 ? (
@@ -723,26 +943,45 @@ const PersonalInformationPanel: FC = () => {
                         <Card
                             key={investment.investmentNumber}
                             sx={{
-                                mb: 2,
-                                borderRadius: 3,
-                                boxShadow: 2,
-                                background: "linear-gradient(90deg, #f1f8e9 60%, #fffde7 100%)",
-                                borderLeft: "5px solid #fbc02d"
+                                mb: 3,
+                                borderRadius: 4,
+                                boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
+                                background: "linear-gradient(135deg, #f1f8e9 0%, #fffde7 50%, #fff3e0 100%)",
+                                borderLeft: "6px solid #ffc107",
+                                transition: "all 0.3s ease",
+                                "&:hover": {
+                                    transform: "translateY(-4px)",
+                                    boxShadow: "0 12px 32px rgba(0,0,0,0.12)"
+                                }
                             }}
                         >
-                            <CardContent>
-                                <Typography fontWeight={700} color="#2e7d32">
+                            <CardContent sx={{ p: 3 }}>
+                                <Typography variant="h6" fontWeight={700} color="#2e7d32" mb={1}>
                                     #{investment.investmentNumber} — {investment.investmentStatus}
                                 </Typography>
-                                <Typography color="#fbc02d" fontWeight={600}>
+                                <Typography variant="h5" color="#fbc02d" fontWeight={700} mb={1}>
                                     💰 {investment.sum} USD
                                 </Typography>
-                                <Typography color="text.secondary">{investment.description}</Typography>
+                                <Typography color="text.secondary" fontSize="1.1rem">
+                                    {investment.description}
+                                </Typography>
                             </CardContent>
                         </Card>
                     ))
                 ) : (
-                    <Typography color="text.secondary">{t('personal.noInvestments')}</Typography>
+                    <Box 
+                        sx={{
+                            textAlign: "center",
+                            py: 6,
+                            borderRadius: 4,
+                            background: "linear-gradient(135deg, rgba(76, 175, 80, 0.05), rgba(255, 193, 7, 0.05))",
+                            border: "2px dashed rgba(76, 175, 80, 0.3)"
+                        }}
+                    >
+                        <Typography color="text.secondary" fontSize="1.2rem">
+                            {t('personal.noInvestments')}
+                        </Typography>
+                    </Box>
                 )}
             </Card>
         </Box>

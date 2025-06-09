@@ -140,6 +140,21 @@
     "privacy": "Privacy Policy",
     "terms": "Terms of Use"
   },
+    "analytics": {
+    "distributionByType": "Distribution by Type",
+    "investmentDynamics": "Investment Dynamics"
+  },
+  "achievements": {
+    "title": "Achievements",
+    "noAchievements": "No achievements yet",
+    "getFirstAchievement": "Make your first investment to get an achievement!",
+    "firstInvestor": "First Investor ⭐",
+    "firstInvestorDesc": "Made first investment",
+    "activeInvestor": "Active Investor 🏆",
+    "activeInvestorDesc": "5+ investments",
+    "professionalInvestor": "Professional Investor 📈",
+    "professionalInvestorDesc": "10+ investments"
+  },
   "investments": {
     "applicationsForLot": "Applications for lot №{{number}}",
     "actions": "Actions",

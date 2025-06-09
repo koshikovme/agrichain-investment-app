@@ -11,6 +11,7 @@ import AchievementPanel from "../components/profile/AchievementPanel";
 const PersonalPage = () => {
     const { t } = useTranslation();
     const { investmentLots } = useAppSelector((state) => state.reducer.investment);
+    const { user } = useAppSelector((state) => state.reducer.auth);
 
     // Группировка по типу
     const byType = useMemo(() => {
@@ -36,12 +37,18 @@ const PersonalPage = () => {
             .sort((a, b) => new Date(a.month).getTime() - new Date(b.month).getTime());
     }, [investmentLots]);
 
+    const isRegularUser = user?.username != 'admin';
+
     return (
         <div>
             <Box>
                 <PersonalInformationPanel />
-                <AnalyticsPanel stats={{ byType, byMonth }} />
-                <AchievementPanel investmentsCount={investmentLots.length}/>
+                {isRegularUser && (
+                    <>
+                        <AnalyticsPanel stats={{ byType, byMonth }} />
+                        <AchievementPanel investmentsCount={investmentLots.length}/>
+                    </>
+                )}
             </Box>
         </div>
     );

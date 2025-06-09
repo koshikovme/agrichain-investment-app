@@ -1,28 +1,36 @@
 import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { fetchUserDetails } from "../features/user/userSlice";
-import { fetchAllInvestments } from "../features/investment/investmentsSlice";
+import {fetchAllInvestments, fetchInvestmentLotApplications} from "../features/investment/investmentsSlice";
 import { keycloak } from "../features/auth/keycloak";
-import CreateInvestmentForm from "../components/CreateInvestmentForm";
-import { InvestmentLotsDto } from "../features/investment/investmentTypes";
+import CreateInvestmentForm from "../components/investments/CreateInvestmentForm";
+import {InvestmentApplicationDto, InvestmentLotsDto } from "../features/investment/investmentTypes";
 import { useTranslation } from "react-i18next";
 import { useInvestmentsWebSocket } from "../features/investment/useInvestmentsWebSocket";
-import { InvestmentFilters, InvestmentFiltersComponent } from "../components/InvestmentFilters";
+import { InvestmentFilters, InvestmentFiltersComponent } from "../components/investments/InvestmentFilters";
+import { ApplyInvestmentModal } from "../components/investments/ApplyInvestmentModal";
+import InvestmentApplicationsModal from "../components/investments/InvestmentApplicationsModal";
+import {Box, Modal} from "@mui/material";
 
 const InvestmentCard = ({
-                            inv,
-                            onBid,
-                            onDividends,
-                            isFarmer,
-                            isOwner
-                        }: {
+    inv,
+    onApplication,
+    onDividends,
+    isFarmer,
+    isOwner,
+    isInvestor,
+    onShowApplications
+}: {
     inv: InvestmentLotsDto;
-    onBid?: (id: number) => void;
+    onApplication?: (id: number) => void;
     onDividends?: (id: number) => void;
     isFarmer: boolean;
     isOwner: boolean;
+    isInvestor: boolean;
+    onShowApplications?: (id: number) => void;
 }) => {
     const { t } = useTranslation();
+    console.log("inv.investmentNumber: ", inv.accountNumber);
 
     return (
         <div className="bg-white rounded-2xl shadow-xl border border-green-100 hover:shadow-2xl transition-all duration-200 flex flex-col p-6 min-w-[320px] max-w-[370px] mx-auto">
@@ -30,6 +38,7 @@ const InvestmentCard = ({
                 <span className="inline-block w-2 h-2 rounded-full bg-green-400"></span>
                 <span className="text-lg font-bold text-green-800">
                     {t('investments.cardTitle', { number: inv.investmentNumber })}
+                    {inv.investmentNumber}
                 </span>
             </div>
             <div className="text-sm text-green-700 mb-1">
@@ -53,7 +62,7 @@ const InvestmentCard = ({
             {isFarmer && !isOwner && inv.investmentStatus === "OPEN" && (
                 <button
                     className="w-full mt-2 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded-xl transition"
-                    onClick={() => onBid && onBid(inv.investmentNumber)}
+                    onClick={() => onApplication && onApplication(inv.investmentNumber)}
                 >
                     {t('investments.submitApplication')}
                 </button>
@@ -66,6 +75,14 @@ const InvestmentCard = ({
                     {t('investments.payDividends')}
                 </button>
             )}
+            {isInvestor && isOwner && (
+                <button
+                    className="w-full mt-2 border border-blue-400 text-green-700 font-semibold py-2 rounded-xl hover:bg-green-800 transition"
+                    onClick={() => onShowApplications && onShowApplications(inv.investmentNumber)}
+                >
+                    {t('investments.viewApplications')}
+                </button>
+            )}
         </div>
     );
 };
@@ -76,11 +93,17 @@ const InvestmentsPage = () => {
     const { userInfo, isLoading, error } = useAppSelector((state) => state.reducer.user);
     const { investmentLots } = useAppSelector((state) => state.reducer.investment);
 
-    const [openForm, setOpenForm] = useState(false);
+    const [openInvestmentLotForm, setOpenInvestmentLotForm] = useState(false);
+    const [openApplyForInvestmentLotForm, setOpenApplyForInvestmentLotForm] = useState(false);
+    const [selectedInvestment, setSelectedInvestment] = useState<number | null>(null);
 
     const isInvestor = userInfo.accountsDto?.accountType === "INVESTORS";
     const isFarmer = userInfo.accountsDto?.accountType === "FARMERS";
     const myAccount = userInfo.accountsDto?.accountNumber;
+
+    const [openApplicationsModal, setOpenApplicationsModal] = useState(false);
+    const [selectedLotId, setSelectedLotId] = useState<number | null>(null);
+    const [applications, setApplications] = useState<InvestmentApplicationDto[]>([]);
 
     useInvestmentsWebSocket();
 
@@ -110,15 +133,16 @@ const InvestmentsPage = () => {
         }
     }, [dispatch, isInvestor, isFarmer, myAccount, keycloak]);
 
-    let visibleInvestments = investmentLots;
-    if (isFarmer && myAccount) {
-        visibleInvestments = investmentLots.filter(
-            (inv) => inv.investmentStatus === "OPEN" && inv.accountNumber !== myAccount
-        );
-    }
+    const handleApplication = (investmentNumber: number) => {
+        setSelectedInvestment(investmentNumber);
+        setOpenApplyForInvestmentLotForm(true);
+    };
 
-    const handleBid = (investmentNumber: number) => {
-        alert(t('investments.applicationSent', { number: investmentNumber }));
+    const handleOpenApplications = async (lotId: number) => {
+        setSelectedLotId(lotId);
+        setOpenApplicationsModal(true);
+        const result = await dispatch(fetchInvestmentLotApplications(lotId)).unwrap();
+        setApplications(result);
     };
 
     const handleDividends = (investmentNumber: number) => {
@@ -140,27 +164,40 @@ const InvestmentsPage = () => {
                         <div className="flex justify-center mb-6">
                             <button
                                 className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-2xl shadow-lg transition text-lg"
-                                onClick={() => setOpenForm(true)}
+                                onClick={() => setOpenInvestmentLotForm(true)}
                             >
                                 {t('investments.createLot')}
                             </button>
                         </div>
-                        {openForm && (
-                            <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-                                <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-lg w-full relative">
-                                    <button
-                                        className="absolute top-3 right-3 text-gray-400 hover:text-green-600 text-2xl"
-                                        onClick={() => setOpenForm(false)}
-                                    >
-                                        &times;
-                                    </button>
-                                    <CreateInvestmentForm />
-                                </div>
-                            </div>
-                        )}
+                        <Modal
+                            open={openInvestmentLotForm}
+                            onClose={() => setOpenInvestmentLotForm(false)}
+                            aria-labelledby="create-investment-modal"
+                            disableScrollLock // добавьте это свойство
+                            sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}
+                        >
+                            <Box
+                                sx={{
+                                    outline: 'none',
+                                    maxWidth: 600,
+                                    width: '100%',
+                                    maxHeight: '90vh',
+                                    borderRadius: 3,
+                                    p: 4,
+                                    overflowY: 'auto', // добавьте это свойство
+                                }}
+                            >
+                                <CreateInvestmentForm onClose={() => setOpenInvestmentLotForm(false)} />
+                            </Box>
+                        </Modal>
+
                     </>
                 )}
-                {visibleInvestments.length === 0 ? (
+                {filteredInvestments.length === 0 ? (
                     <div className="text-center text-gray-500 mt-10 text-lg">
                         {t('investments.noLots')}
                     </div>
@@ -170,14 +207,28 @@ const InvestmentsPage = () => {
                             <InvestmentCard
                                 key={inv.investmentNumber}
                                 inv={inv}
-                                onBid={handleBid}
+                                onApplication={handleApplication}
                                 onDividends={handleDividends}
                                 isFarmer={isFarmer}
                                 isOwner={inv.accountNumber === myAccount}
+                                isInvestor={isInvestor}
+                                onShowApplications={handleOpenApplications}
                             />
                         ))}
                     </div>
                 )}
+                <InvestmentApplicationsModal
+                    open={openApplicationsModal}
+                    onClose={() => setOpenApplicationsModal(false)}
+                    applications={applications}
+                    selectedLotId={selectedLotId}
+                />
+                {/* Модальное окно подачи заявки */}
+                <ApplyInvestmentModal
+                    open={openApplyForInvestmentLotForm}
+                    onClose={() => setOpenApplyForInvestmentLotForm(false)}
+                    investmentNumber={selectedInvestment!}
+                />
             </div>
         </div>
     );

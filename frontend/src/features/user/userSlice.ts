@@ -20,6 +20,7 @@ const initialState: UserState = {
         investmentsLots: [],
         investmentsApplications: []
     },
+    usersList: [],
     isLoading: false,
     error: null
 }
@@ -65,6 +66,23 @@ export const fetchUserDetails = createAsyncThunk(
         }
     }
 )
+
+export const fetchAllUsers = createAsyncThunk(
+    'user/fetchAllUsers',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await axios.get(`${API_URL}/fetch-all-user-details`, {
+                headers: {
+                    Authorization: `Bearer ${keycloak.token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+            return response.data as UsersDto[];
+        } catch (error) {
+            return rejectWithValue('Ошибка при получении списка пользователей');
+        }
+    }
+);
 
 export const createUser = createAsyncThunk(
     'user/createUser',
@@ -137,6 +155,9 @@ export const userSlice = createSlice({
         },
         setUserInfo: (state, action: PayloadAction<UserInfo>) => {
             state.userInfo = action.payload
+        },
+        setUsers: (state, action: PayloadAction<UsersDto[]>) => {
+            state.usersList = action.payload
         }
     },
     extraReducers: (builder) => {
@@ -168,5 +189,5 @@ export const userSlice = createSlice({
     }
 })
 
-export const { resetUser, setUserInfo } = userSlice.actions
+export const { resetUser, setUserInfo, setUsers } = userSlice.actions
 export default userSlice.reducer

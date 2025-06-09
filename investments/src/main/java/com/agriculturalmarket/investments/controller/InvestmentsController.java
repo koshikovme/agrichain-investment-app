@@ -1,5 +1,6 @@
 package com.agriculturalmarket.investments.controller;
 
+import com.agriculturalmarket.investments.dto.InvestmentApplicationDto;
 import com.agriculturalmarket.investments.dto.InvestmentsContactInfoDto;
 import com.agriculturalmarket.investments.dto.InvestmentLotsDto;
 import com.agriculturalmarket.investments.entity.investment.InvestmentApplication;
@@ -30,6 +31,14 @@ public class InvestmentsController {
             @Valid @RequestBody InvestmentLotsDto investmentLotsDto
     ) {
        return investmentsService.publishInvestmentLot(investmentLotsDto, correlationId);
+    }
+
+    @PostMapping("/apply-investment")
+    public void applyInvestment(
+            @RequestHeader("agrichain-correlation-id") String correlationId,
+            @Valid @RequestBody InvestmentApplicationDto investmentApplicationDto
+    ) {
+        investmentsService.applyForInvestmentLot(investmentApplicationDto);
     }
 
     @GetMapping("/fetch-investment")
@@ -77,12 +86,29 @@ public class InvestmentsController {
         return investmentApplicationsRepository.findAllByFarmerId(accountNumber);
     }
 
-    @PostMapping("update-investment")
-    public void updateInvestment(InvestmentLotsDto investmentLotsDto) {
+    @PostMapping("update-investment-application")
+    public void updateInvestmentApplication(
+            @RequestHeader("agrichain-correlation-id") String correlationId,
+            @Valid @RequestBody InvestmentApplicationDto investmentApplicationDto
+    ) {
+        investmentsService.updateInvestmentApplication(investmentApplicationDto);
+    }
+
+    @GetMapping("delete-investment-application")
+    public void deleteInvestmentApplication(
+            @RequestHeader("agrichain-correlation-id") String correlationId,
+            @RequestParam Long investmentNumber,
+            @RequestParam Long accountNumber
+    ) {
+        investmentsService.deleteInvestmentApplication(investmentNumber, accountNumber);
+    }
+
+    @PostMapping("update-investment-lot")
+    public void updateInvestment(@Valid @RequestBody InvestmentLotsDto investmentLotsDto) {
         investmentsService.updateInvestmentLot(investmentLotsDto);
     }
 
-    @GetMapping("delete-investment")
+    @GetMapping("delete-investment-lot")
     public void deleteInvestment(@RequestParam Long investmentNumber) {
         investmentsService.deleteInvestmentLot(investmentNumber);
     }

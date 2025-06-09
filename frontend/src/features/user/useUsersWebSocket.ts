@@ -1,20 +1,23 @@
 import { useEffect } from "react";
 import { Client } from "@stomp/stompjs";
 import { useAppDispatch } from "../../app/hooks";
-import { setUserInfo } from "../user/userSlice";
+import {setUsers} from "./userSlice";
 import { keycloak } from "../auth/keycloak";
 
-export const useUserWebSocket = (mobileNumber: string) => {
+export const useUserWebSocket = () => {
     const dispatch = useAppDispatch();
 
     useEffect(() => {
-        if (!keycloak.token || !mobileNumber) return;
+        if (!keycloak.token) {
+            console.error("Keycloak token is not available");
+            return;
+        }
 
         const client = new Client({
-            brokerURL: "ws://localhost:8072/ws/users",
-            connectHeaders: {
-                Authorization: `Bearer ${keycloak.token}`,
-            },
+            brokerURL: `ws://localhost:8072/ws/users?token=${keycloak.token}`,
+            // connectHeaders: {
+            //     Authorization: `Bearer ${keycloak.token}`,
+            // },
             reconnectDelay: 5000,
             heartbeatIncoming: 4000,
             heartbeatOutgoing: 4000,
@@ -33,23 +36,29 @@ export const useUserWebSocket = (mobileNumber: string) => {
             },
         });
 
-        client.onConnect = () => {
-            console.log("WebSocket connected for user:", mobileNumber);
-            client.subscribe(`/topic/users/${mobileNumber}`, (message) => {
-                console.log("Received user message:", message.body);
+        client.onConnect = (frame) => {
+            console.log("WebSocket connected for users", frame);
+
+            client.subscribe("/topic/users", (message) => {
                 try {
-                    const user = JSON.parse(message.body);
-                    dispatch(setUserInfo(user));
+                    const users = JSON.parse(message.body);
+                    dispatch(setUsers(users));
                 } catch (error) {
                     console.error("Error parsing user message:", error);
                 }
             });
         };
 
+        client.onDisconnect = () => {
+            console.log("WebSocket disconnected");
+        };
+
         client.activate();
 
         return () => {
-            if (client.active) client.deactivate();
+            if (client.active) {
+                client.deactivate();
+            }
         };
-    }, [dispatch, keycloak, mobileNumber]);
+    }, [dispatch, keycloak]);
 };

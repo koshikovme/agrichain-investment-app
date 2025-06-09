@@ -28,12 +28,15 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import PeopleIcon from "@mui/icons-material/People";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { fetchUserDetails } from "../../features/user/userSlice";
+import {fetchAllUsers, fetchUserDetails} from "../../features/user/userSlice";
 import { keycloak } from "../../features/auth/keycloak";
 import UpdateProfileModal from "../UI/modal/UpdateProfileModal";
 import { useUserWebSocket } from "../../features/user/useUsersWebSocket";
 import { useTranslation } from "react-i18next";
-import { InvestmentLotsDto } from "../../features/investment/investmentTypes";
+import {InvestmentApplicationDto, InvestmentLotsDto } from "../../features/investment/investmentTypes";
+import {useInvestmentsWebSocket} from "../../features/investment/useInvestmentsWebSocket";
+import {fetchInvestmentLotApplications, updateInvestmentLot} from "../../features/investment/investmentsSlice";
+import InvestmentApplicationsModal from "../investments/InvestmentApplicationsModal";
 
 // Admin interfaces
 interface NotificationDto {
@@ -94,6 +97,7 @@ interface PaginatedUsers {
 
 const PersonalInformationPanel: FC = () => {
     const [modalOpen, setModalOpen] = useState(false);
+    const [confirmedLotId, setConfirmedLotId] = useState<number | null>(null);
     const [adminTab, setAdminTab] = useState(0);
     const [emailNotifications, setEmailNotifications] = useState<PaginatedEmailNotifications | null>(null);
     const [webNotifications, setWebNotifications] = useState<PaginatedWebNotifications | null>(null);
@@ -106,24 +110,43 @@ const PersonalInformationPanel: FC = () => {
     const [loadingUsers, setLoadingUsers] = useState(false);
     
     const dispatch = useAppDispatch();
-    const { userInfo, isLoading, error } = useAppSelector((state) => state.reducer.user);
+    const { userInfo, isLoading, error, usersList } = useAppSelector((state) => state.reducer.user);
+    const { investmentLots } = useAppSelector((state) => state.reducer.investment);
     const { t } = useTranslation();
 
-    useUserWebSocket(userInfo.mobileNumber);
+    const [openApplicationsModal, setOpenApplicationsModal] = useState(false);
+    const [selectedLotId, setSelectedLotId] = useState<number | null>(null);
+    const [applications, setApplications] = useState<InvestmentApplicationDto[]>([]);
+
+    useUserWebSocket();
+    useInvestmentsWebSocket();
 
     // Check if user is admin
     const isAdmin = keycloak.tokenParsed?.realm_access?.roles?.includes('admin') || 
                    userInfo.name?.toLowerCase() === 'admin';
 
+
+    const handleConfirmLot = async (lot: InvestmentLotsDto) => {
+        try {
+            await dispatch(updateInvestmentLot({ ...lot, investmentStatus: "OPEN" })).unwrap();
+            setConfirmedLotId(lot.investmentNumber);
+        } catch (e) {
+            // обработка ошибки
+        }
+    };
+
+    const handleOpenApplications = async (lotId: number) => {
+        setSelectedLotId(lotId);
+        setOpenApplicationsModal(true);
+        const result = await dispatch(fetchInvestmentLotApplications(lotId)).unwrap();
+        setApplications(result);
+    };
+
     const fetchEmailNotifications = async (page: number = 1) => {
         setLoadingEmailNotifications(true);
         try {
-            const response = await fetch(`/agrichain/notifications/email?page=${page}&per_page=10`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${keycloak.token}`,
-                    'Content-Type': 'application/json'
-                }
+            const response = await fetch(`http://localhost:8081/notifications/email?page=${page}&per_page=10`, {
+                method: 'GET'
             });
             if (response.ok) {
                 const result = await response.json();
@@ -140,12 +163,8 @@ const PersonalInformationPanel: FC = () => {
     const fetchWebNotifications = async (page: number = 1) => {
         setLoadingWebNotifications(true);
         try {
-            const response = await fetch(`/agrichain/notifications/web?page=${page}&per_page=10`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${keycloak.token}`,
-                    'Content-Type': 'application/json'
-                }
+            const response = await fetch(`http://localhost:8081/agrichain/notifications/web`, {
+                method: 'GET'
             });
             if (response.ok) {
                 const result = await response.json();
@@ -158,25 +177,25 @@ const PersonalInformationPanel: FC = () => {
         }
     };
 
-    const fetchUsers = async (page: number = 1) => {
-        setLoadingUsers(true);
-        try {
-            const response = await fetch(`/agrichain/users/fetch-all-user-details?page=${page}&size=10`, {
-                headers: {
-                    'Authorization': `Bearer ${keycloak.token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-            if (response.ok) {
-                const data = await response.json();
-                setUsers(data);
-            }
-        } catch (error) {
-            console.error('Error fetching users:', error);
-        } finally {
-            setLoadingUsers(false);
-        }
-    };
+    // const fetchUsers = async (page: number = 1) => {
+    //     setLoadingUsers(true);
+    //     try {
+    //         const response = await fetch(`http://localhost:8072/agrichain/users/fetch-all-user-details`, {
+    //             headers: {
+    //                 'Authorization': `Bearer ${keycloak.token}`,
+    //                 'Content-Type': 'application/json'
+    //             }
+    //         });
+    //         if (response.ok) {
+    //             const data = await response.json();
+    //             setUsers(data);
+    //         }
+    //     } catch (error) {
+    //         console.error('Error fetching users:', error);
+    //     } finally {
+    //         setLoadingUsers(false);
+    //     }
+    // };
 
     useEffect(() => {
         const mobileNumber = keycloak.tokenParsed?.mobile_number;
@@ -185,7 +204,6 @@ const PersonalInformationPanel: FC = () => {
         if (isAdmin) {
             fetchEmailNotifications();
             fetchWebNotifications();
-            fetchUsers();
         }
     }, [dispatch, isAdmin]);
 
@@ -201,7 +219,6 @@ const PersonalInformationPanel: FC = () => {
 
     const handleUserPageChange = (event: React.ChangeEvent<unknown>, value: number) => {
         setUserPage(value);
-        fetchUsers(value);
     };
 
     const formatDate = (dateString: string) => {
@@ -314,6 +331,11 @@ const PersonalInformationPanel: FC = () => {
                         <Tab 
                             icon={<PeopleIcon />} 
                             label={t('admin.users')} 
+                            sx={{ fontWeight: 600 }}
+                        />
+                        <Tab
+                            icon={<AgricultureIcon />}
+                            label={t('admin.investmentLots')}
                             sx={{ fontWeight: 600 }}
                         />
                     </Tabs>
@@ -461,7 +483,7 @@ const PersonalInformationPanel: FC = () => {
                                 <Typography variant="h6" color="#1976d2">
                                     👥 {t('admin.usersList')}
                                 </Typography>
-                                <IconButton onClick={() => fetchUsers(userPage)} color="primary">
+                                <IconButton color="primary">
                                     <RefreshIcon />
                                 </IconButton>
                             </Box>
@@ -484,8 +506,8 @@ const PersonalInformationPanel: FC = () => {
                                                 </TableRow>
                                             </TableHead>
                                             <TableBody>
-                                                {users?.users.map((user) => (
-                                                    <TableRow key={user.id}>
+                                                {usersList.map((user) => (
+                                                    <TableRow key={user.accountsDto?.accountNumber}>
                                                         <TableCell>
                                                             <Box>
                                                                 <Typography fontWeight={600}>
@@ -500,12 +522,12 @@ const PersonalInformationPanel: FC = () => {
                                                         <TableCell>{user.mobileNumber}</TableCell>
                                                         <TableCell>
                                                             <Chip 
-                                                                label={user.accountType || t('admin.standard')} 
+                                                                label={user.accountsDto?.accountType || t('admin.standard')}
                                                                 color="info"
                                                                 size="small"
                                                             />
                                                         </TableCell>
-                                                        <TableCell>{formatDate(user.createdAt)}</TableCell>
+                                                        {/*<TableCell>{formatDate(user.createdAt)}</TableCell>*/}
                                                     </TableRow>
                                                 ))}
                                             </TableBody>
@@ -526,6 +548,61 @@ const PersonalInformationPanel: FC = () => {
                             )}
                         </Box>
                     )}
+
+                    {adminTab === 3 && (
+                        <Box>
+                            <Typography variant="h6" color="#1976d2" mb={2}>
+                                🌱 {t('admin.allInvestmentLots')}
+                            </Typography>
+                            <TableContainer component={Paper} sx={{ mb: 2 }}>
+                                <Table>
+                                    <TableHead>
+                                        <TableRow sx={{ bgcolor: "#e3f2fd" }}>
+                                            <TableCell>{t('investments.cardTitle')}</TableCell>
+                                            <TableCell>{t('investments.status')}</TableCell>
+                                            <TableCell>{t('investments.type')}</TableCell>
+                                            <TableCell>{t('investments.amount')}</TableCell>
+                                            <TableCell>{t('investments.description')}</TableCell>
+                                            <TableCell>{t('admin.actions')}</TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {investmentLots.map((lot) => (
+                                            <TableRow key={lot.investmentNumber} onClick={() => handleOpenApplications(lot.investmentNumber)} style={{ cursor: "pointer" }}>
+                                                <TableCell>#{lot.investmentNumber}</TableCell>
+                                                <TableCell>{lot.investmentStatus}</TableCell>
+                                                <TableCell>{lot.investmentType}</TableCell>
+                                                <TableCell>{lot.sum} USD</TableCell>
+                                                <TableCell>{lot.description}</TableCell>
+                                                <TableCell>
+                                                    {confirmedLotId === lot.investmentNumber || lot.investmentStatus === "OPEN" ? (
+                                                        <Typography color="success.main" fontWeight={600}>
+                                                            {t('admin.confirmed')}
+                                                        </Typography>
+                                                    ) : (
+                                                        <Button
+                                                            variant="contained"
+                                                            color="success"
+                                                            size="small"
+                                                            onClick={() => handleConfirmLot(lot)}
+                                                        >
+                                                            {t('admin.confirm')}
+                                                        </Button>
+                                                    )}
+                                                </TableCell>
+                                                <InvestmentApplicationsModal
+                                                    open={openApplicationsModal}
+                                                    onClose={() => setOpenApplicationsModal(false)}
+                                                    applications={applications}
+                                                    selectedLotId={selectedLotId}
+                                                />
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                        </Box>
+                    )}
                 </Card>
             </Box>
         );
@@ -535,7 +612,6 @@ const PersonalInformationPanel: FC = () => {
     return (
         <Box
             sx={{
-                px: 3,
                 py: 5,
                 fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
                 background: "linear-gradient(90deg, #e8f5e9 0%, #fffde7 100%)",

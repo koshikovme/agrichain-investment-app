@@ -1,5 +1,5 @@
 import React from "react";
-import { InvestmentType, InvestmentLotStatus } from "../features/investment/investmentTypes";
+import { InvestmentType, InvestmentLotStatus } from "../../features/investment/investmentTypes";
 import { GiCow, GiWheat, GiFarmTractor, GiMoneyStack } from "react-icons/gi";
 import { MdOutlineFilterAlt } from "react-icons/md";
 

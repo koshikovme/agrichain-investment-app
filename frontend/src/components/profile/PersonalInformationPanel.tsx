@@ -48,32 +48,41 @@ interface NotificationDto {
     isRead: boolean;
 }
 
+interface Metadata {
+    body?: string;
+    subject?: string;
+}
+
 interface EmailNotificationDto {
-    userID: number;
-    email: string;
-    name: string;
-    notificationType: string;
-    metadata: { [key: string]: string };
-    createdAt: string;
+    UserID: number;
+    Email: string;
+    Name: string;
+    NotificationType: string;
+    Metadata: Metadata;
+    CreatedAt: string;
 }
 
 interface WebNotificationDto {
-    userID: number;
-    email: string;
-    name: string;
-    notificationType: string;
-    metadata: { [key: string]: string };
-    createdAt: string;
-    isRead: boolean;
+    UserID: number;
+    Email: string;
+    Name: string;
+    NotificationType: string;
+    Metadata: Metadata;
+    CreatedAt: string;
+    IsRead: boolean;
 }
 
 interface PaginatedEmailNotifications {
-    notifications: EmailNotificationDto[];
+    data: {
+        notifications: EmailNotificationDto[];
+    }
     total: number;
 }
 
 interface PaginatedWebNotifications {
-    notifications: WebNotificationDto[];
+    data: {
+        notifications: WebNotificationDto[];
+    }
     total: number;
 }
 
@@ -150,11 +159,24 @@ const PersonalInformationPanel: FC = () => {
             });
             if (response.ok) {
                 const result = await response.json();
-                setEmailNotifications(result.data);
+                console.log("RAW RESPONSE: ", result);
+                if (result?.data?.Notifications) {
+                    setEmailNotifications({
+                        data: {
+                            notifications: result.data.Notifications
+                        },
+                        total: result.data.Total || 0
+                    });
+
+                    console.log("emailNotifications: ", emailNotifications)
+                } else {
+                    console.error('Invalid email notifications response format:', result);
+                }
+            } else {
+                console.error('Failed to fetch email notifications:', response.statusText);
             }
         } catch (error) {
             console.error('Error fetching email notifications:', error);
-            console.log(error);
         } finally {
             setLoadingEmailNotifications(false);
         }
@@ -163,12 +185,24 @@ const PersonalInformationPanel: FC = () => {
     const fetchWebNotifications = async (page: number = 1) => {
         setLoadingWebNotifications(true);
         try {
-            const response = await fetch(`http://localhost:8081/agrichain/notifications/web`, {
+            const response = await fetch(`http://localhost:8081/notifications/web?page=${page}&per_page=10`, {
                 method: 'GET'
             });
             if (response.ok) {
                 const result = await response.json();
-                setWebNotifications(result.data);
+                console.log("RAW RESPONSE: ", result);
+                if (result?.data?.Notifications) {
+                    setWebNotifications({
+                        data: {
+                            notifications: result.data.Notifications
+                        },
+                        total: result.data.Total || 0
+                    });
+                } else {
+                    console.error('Invalid web notifications response format:', result);
+                }
+            } else {
+                console.error('Failed to fetch web notifications:', response.statusText);
             }
         } catch (error) {
             console.error('Error fetching web notifications:', error);
@@ -176,26 +210,6 @@ const PersonalInformationPanel: FC = () => {
             setLoadingWebNotifications(false);
         }
     };
-
-    // const fetchUsers = async (page: number = 1) => {
-    //     setLoadingUsers(true);
-    //     try {
-    //         const response = await fetch(`http://localhost:8072/agrichain/users/fetch-all-user-details`, {
-    //             headers: {
-    //                 'Authorization': `Bearer ${keycloak.token}`,
-    //                 'Content-Type': 'application/json'
-    //             }
-    //         });
-    //         if (response.ok) {
-    //             const data = await response.json();
-    //             setUsers(data);
-    //         }
-    //     } catch (error) {
-    //         console.error('Error fetching users:', error);
-    //     } finally {
-    //         setLoadingUsers(false);
-    //     }
-    // };
 
     useEffect(() => {
         const mobileNumber = keycloak.tokenParsed?.mobile_number;
@@ -226,7 +240,7 @@ const PersonalInformationPanel: FC = () => {
     };
 
     const getNotificationTypeColor = (type: string) => {
-        switch (type.toLowerCase()) {
+        switch (type?.toLowerCase()) {
             case 'registration': return 'success';
             case 'login': return 'info';
             case 'investment_success': return 'success';
@@ -236,7 +250,7 @@ const PersonalInformationPanel: FC = () => {
         }
     };
 
-    const getMessageFromMetadata = (metadata: { [key: string]: string }) => {
+    const getMessageFromMetadata = (metadata: Metadata) => {
         return metadata?.subject || metadata?.body || 'No message';
     };
 
@@ -370,21 +384,29 @@ const PersonalInformationPanel: FC = () => {
                                                 </TableRow>
                                             </TableHead>
                                             <TableBody>
-                                                {emailNotifications?.notifications.map((notification, index) => (
-                                                    <TableRow key={`email-${notification.userID}-${index}`}>
-                                                        <TableCell>{getMessageFromMetadata(notification.metadata)}</TableCell>
-                                                        <TableCell>
-                                                            <Chip 
-                                                                label={notification.notificationType} 
-                                                                color={getNotificationTypeColor(notification.notificationType)}
-                                                                size="small"
-                                                            />
+                                                {emailNotifications?.data.notifications?.length != null && emailNotifications?.data.notifications?.length > 0 ? (
+                                                    emailNotifications?.data.notifications?.map((notification, index) => (
+                                                        <TableRow key={`email-${notification.UserID}-${index}`}>
+                                                            <TableCell>{getMessageFromMetadata(notification.Metadata)}</TableCell>
+                                                            <TableCell>
+                                                                <Chip
+                                                                    label={notification.NotificationType}
+                                                                    color={getNotificationTypeColor(notification.NotificationType)}
+                                                                    size="small"
+                                                                />
+                                                            </TableCell>
+                                                            <TableCell>{notification.Email}</TableCell>
+                                                            <TableCell>{notification.Name}</TableCell>
+                                                            {/*<TableCell>{formatDate(notification.)}</TableCell>*/}
+                                                        </TableRow>
+                                                    ))
+                                                ) : (
+                                                    <TableRow>
+                                                        <TableCell colSpan={5} align="center">
+                                                            {t('admin.noNotifications')}
                                                         </TableCell>
-                                                        <TableCell>{notification.email}</TableCell>
-                                                        <TableCell>{notification.name}</TableCell>
-                                                        <TableCell>{formatDate(notification.createdAt)}</TableCell>
                                                     </TableRow>
-                                                ))}
+                                                )}
                                             </TableBody>
                                         </Table>
                                     </TableContainer>
@@ -435,26 +457,26 @@ const PersonalInformationPanel: FC = () => {
                                                 </TableRow>
                                             </TableHead>
                                             <TableBody>
-                                                {webNotifications?.notifications.map((notification, index) => (
-                                                    <TableRow key={`web-${notification.userID}-${index}`}>
-                                                        <TableCell>{getMessageFromMetadata(notification.metadata)}</TableCell>
+                                                {webNotifications?.data.notifications?.map((notification, index) => (
+                                                    <TableRow key={`web-${notification.UserID}-${index}`}>
+                                                        <TableCell>{getMessageFromMetadata(notification.Metadata)}</TableCell>
                                                         <TableCell>
                                                             <Chip 
-                                                                label={notification.notificationType} 
-                                                                color={getNotificationTypeColor(notification.notificationType)}
+                                                                label={notification.NotificationType}
+                                                                color={getNotificationTypeColor(notification.NotificationType)}
                                                                 size="small"
                                                             />
                                                         </TableCell>
                                                         <TableCell>
                                                             <Chip 
-                                                                label={notification.isRead ? t('admin.read') : t('admin.unread')} 
-                                                                color={notification.isRead ? 'default' : 'warning'}
+                                                                label={notification.IsRead ? t('admin.read') : t('admin.unread')}
+                                                                color={notification.IsRead ? 'default' : 'warning'}
                                                                 size="small"
                                                             />
                                                         </TableCell>
-                                                        <TableCell>{notification.email}</TableCell>
-                                                        <TableCell>{notification.name}</TableCell>
-                                                        <TableCell>{formatDate(notification.createdAt)}</TableCell>
+                                                        <TableCell>{notification.Email}</TableCell>
+                                                        <TableCell>{notification.Name}</TableCell>
+                                                        {/*<TableCell>{formatDate(notification.createdAt)}</TableCell>*/}
                                                     </TableRow>
                                                 ))}
                                             </TableBody>

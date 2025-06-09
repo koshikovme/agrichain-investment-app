@@ -21,19 +21,19 @@ export const useUserWebSocket = () => {
             reconnectDelay: 5000,
             heartbeatIncoming: 4000,
             heartbeatOutgoing: 4000,
-            debug: (str) => {
-                console.log('STOMP Debug:', str);
-            },
-            // Handle connection errors
-            onStompError: (frame) => {
-                console.error('STOMP Error:', frame);
-            },
-            onWebSocketError: (error) => {
-                console.error('WebSocket Error:', error);
-            },
-            onWebSocketClose: (event) => {
-                console.error('WebSocket Closed:', event);
-            },
+            // debug: (str) => {
+            //     console.log('STOMP Debug:', str);
+            // },
+            // // Handle connection errors
+            // onStompError: (frame) => {
+            //     console.error('STOMP Error:', frame);
+            // },
+            // onWebSocketError: (error) => {
+            //     console.error('WebSocket Error:', error);
+            // },
+            // onWebSocketClose: (event) => {
+            //     console.error('WebSocket Closed:', event);
+            // },
         });
 
         client.onConnect = (frame) => {

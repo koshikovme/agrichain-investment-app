@@ -36,6 +36,14 @@ public class PaymentsController {
                 .body(paymentResponseDto);
     }
 
+    @GetMapping("/get-payment/{paymentId}")
+    public ResponseEntity<PaymentResponseDto> getPaymentById(@PathVariable String paymentId) {
+        PaymentResponseDto paymentResponseDto = paymentsService.getPaymentById(paymentId);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(paymentResponseDto);
+    }
+
     @GetMapping("/get-payments")
     public List<PaymentResponseDto> getPayments() {
         return paymentsService.getPayments();

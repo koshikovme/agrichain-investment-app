@@ -6,7 +6,8 @@ import com.agriculturalmarket.investments.dto.PaymentResponseDto;
 import java.util.List;
 
 public interface PaymentsService {
-    public PaymentResponseDto createPaymentForInvestment(InvestmentRequestDto investmentRequestDto);
-    public PaymentResponseDto executePayment(String correlationId, InvestmentRequestDto investmentRequestDto);
-    public List<PaymentResponseDto> getPayments();
+    PaymentResponseDto createPaymentForInvestment(InvestmentRequestDto investmentRequestDto);
+    PaymentResponseDto executePayment(String correlationId, InvestmentRequestDto investmentRequestDto);
+    PaymentResponseDto getPaymentById(String paymentId);
+    List<PaymentResponseDto> getPayments();
 }

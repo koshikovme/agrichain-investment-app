@@ -11,7 +11,8 @@ import { PhantomWalletAdapter } from "@solana/wallet-adapter-wallets";
 import "@solana/wallet-adapter-react-ui/styles.css";
 import MainPage from "./pages/MainPage";
 import SolanaPayLinkGenerator from "./features/solana/SolanaPayLinkGenerator";
-import './index.css'; 
+import './index.css';
+import PaymentSuccessPage from "./pages/PaymentSuccessPage";
 const ENDPOINT = "https://api.devnet.solana.com";
 
 const App = () => {
@@ -40,6 +41,7 @@ const App = () => {
                                         </div>
                                     }
                                 />
+                                <Route path="/payment-success" element={<PaymentSuccessPage />} />
                             </Routes>
                         <Footer />
                         </div>

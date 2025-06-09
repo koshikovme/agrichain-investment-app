@@ -50,6 +50,16 @@ public class PaymentsServiceImpl implements PaymentsService {
         return PaymentsMapper.toDto(executePaymentResponse);
     }
 
+    @Override
+    public PaymentResponseDto getPaymentById(String paymentId) {
+        Payment.GetPaymentRequest getPaymentRequest = Payment.GetPaymentRequest.newBuilder()
+                .setId(paymentId)
+                .build();
+
+        Payment.PaymentResponse paymentResponse = paymentGrpcClient.getPayment(getPaymentRequest);
+        return PaymentsMapper.toDto(paymentResponse);
+    }
+
     private Payment.PaymentResponse executePayment(InvestmentRequestDto investmentRequestDto) {
         PaymentResponseDto paymentResponseDto = investmentRequestDto.getPaymentResponseDto();
         InvestmentLotsDto targetInvestment = investmentsService.fetchUserInvestmentLot(investmentRequestDto.getInvestmentNumber());

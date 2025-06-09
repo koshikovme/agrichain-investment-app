@@ -141,6 +141,10 @@
     "terms": "Условия использования"
   },
   "investments": {
+    "applicationsForLot": "Заявки на лот №{{number}}",
+    "actions": "Действия",
+    "accept": "Принять",
+    "pay": "Оплатить",
     "noApplications": "Нет заявок на лоты",
     "viewApplications": "Просмотреть заявки",
     "sendApplicationForLot": "Отправить заявку на лот",

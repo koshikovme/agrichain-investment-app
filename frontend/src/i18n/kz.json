@@ -141,6 +141,10 @@
     "terms": "Пайдалану шарттары"
   },
   "investments": {
+    "applicationsForLot": "№{{number}} лотқа өтінімдер",
+    "actions": "Әрекеттер",
+    "accept": "Қабылдау",
+    "pay": "Төлеу",
     "noApplications": "Инвестициялық лоттарға өтінімдер жоқ",
     "viewApplications": "Өтінімдерді қарау",
     "applicationsForLot": "№{{number}} лотқа өтінімдер",

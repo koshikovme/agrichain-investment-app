@@ -33,6 +33,23 @@ export const fetchPayments = createAsyncThunk(
     }
 );
 
+export const fetchPaymentById = createAsyncThunk(
+    'investment/fetchPaymentById',
+    async (paymentId: string, { rejectWithValue }) => {
+        try {
+            const response = await axios.get(`${API_URL}/get-payment/${paymentId}`, {
+                headers: {
+                    Authorization: `Bearer ${keycloak.token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+            return response.data as PaymentResponseDto;
+        } catch (error) {
+            return rejectWithValue('Failed to fetch payment by ID');
+        }
+    }
+);
+
 
 // Создать платёж
 export const createPaymentForInvestment = createAsyncThunk(
@@ -80,6 +97,9 @@ export const executePaymentForInvestment = createAsyncThunk(
 );
 
 
+
+
+
 const paymentSlice = createSlice({
     name: 'investment',
     initialState,
@@ -93,6 +113,18 @@ const paymentSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
+            .addCase(fetchPaymentById.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(fetchPaymentById.fulfilled, (state, action: PayloadAction<PaymentResponseDto>) => {
+                state.isLoading = false;
+                state.selectedPayment = action.payload;
+            })
+            .addCase(fetchPaymentById.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload as string;
+            })
             .addCase(fetchPayments.pending, (state) => {
                 state.isLoading = true;
                 state.error = null;

@@ -13,7 +13,7 @@ const AchievementPanel: React.FC<AchievementPanelProps> = ({ investmentsCount })
             <Typography variant="h6" color="#388e3c" fontWeight={700} mb={1}>
                 Достижения
             </Typography>
-            {investmentsCount >= 2 ? (
+            {investmentsCount >= 1 ? (
                 <Chip
                     icon={<EmojiEventsIcon style={{ color: "#fbc02d" }} />}
                     label="Инвестор ⭐ (5+ инвестиций)"

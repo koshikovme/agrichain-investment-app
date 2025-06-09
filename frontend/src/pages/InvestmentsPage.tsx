@@ -75,6 +75,11 @@ const InvestmentCard = ({
                     {t('investments.payDividends')}
                 </button>
             )}
+            {/*{isFarmer &&  === "APPLIED" && (*/}
+            {/*    <div className="text-green-500 font-semibold">*/}
+            {/*        {t('investments.applied')}*/}
+            {/*    </div>*/}
+            {/*)}*/}
             {isInvestor && isOwner && (
                 <button
                     className="w-full mt-2 border border-blue-400 text-green-700 font-semibold py-2 rounded-xl hover:bg-green-800 transition"

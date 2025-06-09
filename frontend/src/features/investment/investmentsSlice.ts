@@ -161,6 +161,42 @@ export const fetchAllInvestmentApplications = createAsyncThunk(
     }
 );
 
+export const updateInvestmentApplication = createAsyncThunk(
+    'investment/updateInvestmentApplication',
+    async (application: InvestmentApplicationDto, { rejectWithValue }) => {
+        try {
+            const response = await axios.post(
+                `${API_URL}/update-investment-application`,
+                application,
+                {
+                    headers: {
+                        Authorization: `Bearer ${keycloak.token}`,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            );
+            return response.data as InvestmentApplicationDto;
+        } catch (error) {
+            return rejectWithValue('Failed to update investment application');
+        }
+    }
+);
+
+export const deleteInvestmentApplication = createAsyncThunk(
+    'investment/deleteInvestmentApplication',
+    async (applicationId: number, { rejectWithValue }) => {
+        try {
+            await axios.get(`${API_URL}/delete-investment-application`, {
+                params: { applicationId },
+                headers: { 'agrichain-correlation-id': 'frontend' },
+            });
+            return applicationId;
+        } catch (error) {
+            return rejectWithValue('Failed to delete investment application');
+        }
+    }
+);
+
 // Обновить лот
 export const updateInvestmentLot = createAsyncThunk(
     'investment/updateInvestmentLot',

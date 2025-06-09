@@ -1,6 +1,6 @@
 export interface PaymentState {
     payments: PaymentsDto[];
-    selectedPayment: PaymentsDto | null;
+    selectedPayment: PaymentResponseDto | null;
     isLoading: boolean;
     error: string | null;
     paymentResponse: PaymentResponseDto | null;

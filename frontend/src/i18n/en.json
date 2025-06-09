@@ -141,6 +141,10 @@
     "terms": "Terms of Use"
   },
   "investments": {
+    "applicationsForLot": "Applications for lot №{{number}}",
+    "actions": "Actions",
+    "accept": "Accept",
+    "pay": "Pay",
     "noApplications": "No applications for investment lots",
     "viewApplications": "View applications",
     "applicationsForLot": "Applications for lot №{{number}}",

@@ -12,18 +12,18 @@ import "@solana/wallet-adapter-react-ui/styles.css";
 import MainPage from "./pages/MainPage";
 import SolanaPayLinkGenerator from "./features/solana/SolanaPayLinkGenerator";
 import './index.css';
+import { SolanaProvider } from './features/solana/WalletConnectionProvider';
 import PaymentSuccessPage from "./pages/PaymentSuccessPage";
 const ENDPOINT = "https://api.devnet.solana.com";
+
 
 const App = () => {
     const wallets = useMemo(() => [new PhantomWalletAdapter()], []);
 
 
     return (
-        <ConnectionProvider endpoint={ENDPOINT}>
-            <WalletProvider wallets={wallets} autoConnect>
-                <WalletModalProvider>
-                    <Router>
+        <SolanaProvider>
+            <Router>
                         <Navbar />
                         <div style={{ paddingTop: "64px" }}> {/* высота AppBar */}
                             <Routes>
@@ -45,10 +45,8 @@ const App = () => {
                             </Routes>
                         <Footer />
                         </div>
-                    </Router>
-                </WalletModalProvider>
-            </WalletProvider>
-        </ConnectionProvider>
+            </Router>
+        </SolanaProvider>
     );
 };
 

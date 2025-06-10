@@ -145,6 +145,11 @@
     "investmentDynamics": "Investment Dynamics"
   },
   "achievements": {
+    "firstClosedLot": "First Closed Lot 🏅",
+    "firstClosedLotDesc": "Closed your first investment lot",
+    "paymentId": "Payment ID",
+    "paymentSuccess": "Payment successful",
+    "paymentExecuted": "Payment executed",
     "title": "Achievements",
     "noAchievements": "No achievements yet",
     "getFirstAchievement": "Make your first investment to get an achievement!",
@@ -156,6 +161,11 @@
     "professionalInvestorDesc": "10+ investments"
   },
   "investments": {
+    "dividendsInitiated": "Dividend payment initiated",
+    "paymentSuccessSolana": "Payment successful via Solana Pay",
+    "thankYou": "Thank you for your investment!",
+    "backToMain": "Back to main",
+    "farmerChosen": "Farmer chosen",
     "applicationsForLot": "Applications for lot №{{number}}",
     "actions": "Actions",
     "accept": "Accept",
@@ -210,6 +220,8 @@
     "noUserData": "No user data found."
   },
   "admin": {
+    "viewApplications": "View Applications",
+    "applications": "Applications",
     "noApplications": "No applications for investment lots",
     "investmentLots": "Investment Lots",
     "allInvestmentLots": "All Investment Lots",

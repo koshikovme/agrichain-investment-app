@@ -4,7 +4,7 @@ target/
 .idea/
 *.iml
 application.properties
-.env
+paypal-solana-service/.env
 config.yaml
 docker-compose.keycloak.yml
 node_modules/

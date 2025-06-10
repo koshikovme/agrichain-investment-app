@@ -289,6 +289,29 @@ const investmentSlice = createSlice({
             .addCase(fetchAllInvestmentApplications.fulfilled, (state, action: PayloadAction<InvestmentApplicationDto[]>) => {
                 state.investmentsApplications = action.payload;
             })
+            .addCase(fetchInvestmentApplication.fulfilled, (state, action: PayloadAction<InvestmentApplicationDto>) => {
+                state.selectedInvestmentApplication = action.payload;
+            })
+            .addCase(createInvestmentApplication.fulfilled, (state, action: PayloadAction<InvestmentApplicationDto>) => {
+                state.investmentsApplications.push(action.payload);
+            })
+            .addCase(updateInvestmentLot.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(updateInvestmentLot.fulfilled, (state, action: PayloadAction<InvestmentLotsDto>) => {
+                state.isLoading = false;
+                const index = state.investmentLots.findIndex(inv => inv.investmentNumber === action.payload.investmentNumber);
+                if (index !== -1) {
+                    state.investmentLots[index] = action.payload;
+                }
+            })
+            // .addCase(updateInvestmentApplication.fulfilled, (state, action: PayloadAction<InvestmentApplicationDto>) => {
+            //     const index = state.investmentsApplications.findIndex(app => app. === action.payload.applicationId);
+            //     if (index !== -1) {
+            //         state.investmentsApplications[index] = action.payload;
+            //     }
+            // })
             .addCase(deleteInvestment.fulfilled, (state, action: PayloadAction<number>) => {
                 state.investmentLots = state.investmentLots.filter(inv => inv.investmentNumber !== action.payload);
             });

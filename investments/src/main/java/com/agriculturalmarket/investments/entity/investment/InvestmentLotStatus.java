@@ -7,5 +7,6 @@ public enum InvestmentLotStatus {
     OPEN,
     UNDER_REVIEW,
     CLOSED,
-    REJECTED
+    REJECTED,
+    IN_WORK
 }

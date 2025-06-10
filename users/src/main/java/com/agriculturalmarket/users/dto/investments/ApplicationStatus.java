@@ -8,5 +8,6 @@ public enum ApplicationStatus {
     ACCEPTED,  // Bid has been accepted by the farmer
     REJECTED,  // Bid has been rejected by the farmer
     CANCELLED, // Bid has been cancelled by the investor or system
-    EXPIRED;   // Bid has expired without action
+    EXPIRED,   // Bid has expired without action
+    COMPLETED   // Bid has expired without action
 }

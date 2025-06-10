@@ -3,7 +3,6 @@ import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { publishInvestmentLot } from '../../features/investment/investmentsSlice';
 import { InvestmentLotsDto, InvestmentType, InvestmentLotStatus, ConfirmationType } from '../../features/investment/investmentTypes';
 import { Box, Button, MenuItem, Select, Typography, InputLabel, FormControl, Paper, Alert, Snackbar, IconButton, useMediaQuery } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
 import type { SelectChangeEvent } from '@mui/material/Select';
 import { useTheme } from '@mui/material/styles';
 import { useNotificationWebSocket } from "../../features/notification/useNotificationWebSocket";
@@ -32,7 +31,7 @@ const CreateInvestmentForm: React.FC<Props> = ({ onClose }) => {
 
     const [form, setForm] = useState<Partial<InvestmentLotsDto>>({
         investmentType: 'CATTLE',
-        sum: 0,
+        sum: undefined,
         description: '',
         returnConditions: '',
         requirements: '',
@@ -67,7 +66,7 @@ const CreateInvestmentForm: React.FC<Props> = ({ onClose }) => {
         }));
     };
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setForm((prev) => ({
             ...prev,

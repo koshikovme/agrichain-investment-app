@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { fetchUserDetails } from "../features/user/userSlice";
-import {fetchAllInvestments, fetchInvestmentLotApplications} from "../features/investment/investmentsSlice";
+import {
+    fetchAllInvestments, fetchInvestment,
+    fetchInvestmentApplication,
+    fetchInvestmentLotApplications, updateInvestmentApplication,
+    updateInvestmentLot
+} from "../features/investment/investmentsSlice";
 import { keycloak } from "../features/auth/keycloak";
 import CreateInvestmentForm from "../components/investments/CreateInvestmentForm";
 import {InvestmentApplicationDto, InvestmentLotsDto } from "../features/investment/investmentTypes";
@@ -11,6 +16,7 @@ import { InvestmentFilters, InvestmentFiltersComponent } from "../components/inv
 import { ApplyInvestmentModal } from "../components/investments/ApplyInvestmentModal";
 import InvestmentApplicationsModal from "../components/investments/InvestmentApplicationsModal";
 import {Box, Modal} from "@mui/material";
+import {userInfo} from "node:os";
 
 const InvestmentCard = ({
     inv,
@@ -19,7 +25,7 @@ const InvestmentCard = ({
     isFarmer,
     isOwner,
     isInvestor,
-    onShowApplications
+    onShowApplications,
 }: {
     inv: InvestmentLotsDto;
     onApplication?: (id: number) => void;
@@ -30,8 +36,24 @@ const InvestmentCard = ({
     onShowApplications?: (id: number) => void;
 }) => {
     const { t } = useTranslation();
-    console.log("inv.investmentNumber: ", inv.accountNumber);
+    const dispatch = useAppDispatch();
+    const { investmentsApplications } = useAppSelector((state) => state.reducer.investment);
 
+    const {userInfo} = useAppSelector((state) => state.reducer.user);
+    // Фильтруем заявки только по текущему лоту
+    const lotApplications = investmentsApplications.filter(app => app.lotId === inv.investmentNumber);
+    const winnerApplication = lotApplications.find(app => app.applicationStatus === 'ACCEPTED');
+
+    // useEffect(() => {
+    //     if (!keycloak.tokenParsed?.mobileNumber) return;
+    //     console.log("Fetching user details for mobile number:", keycloak.tokenParsed.mobileNumber);
+    //     dispatch(fetchUserDetails(keycloak.tokenParsed?.mobileNumber));
+    // }, [dispatch, keycloak.token]);
+
+    useEffect(() => {
+        dispatch(fetchInvestmentLotApplications(inv.investmentNumber));
+        console.log("userInfo: ", userInfo)
+    }, [dispatch, inv.investmentNumber]);
     return (
         <div className="bg-white rounded-2xl shadow-xl border border-green-100 hover:shadow-2xl transition-all duration-200 flex flex-col p-6 min-w-[320px] max-w-[370px] mx-auto">
             <div className="flex items-center gap-2 mb-2">
@@ -59,15 +81,21 @@ const InvestmentCard = ({
             <div className="text-sm text-gray-700 mb-2">
                 <span className="font-semibold">{t('investments.requirements')}:</span> {inv.requirements}
             </div>
-            {isFarmer && !isOwner && inv.investmentStatus === "OPEN" && (
-                <button
-                    className="w-full mt-2 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded-xl transition"
-                    onClick={() => onApplication && onApplication(inv.investmentNumber)}
-                >
-                    {t('investments.submitApplication')}
-                </button>
+            {winnerApplication ? (
+                <div className="text-green-600 font-semibold">
+                    {t('investments.farmerChosen')}
+                </div>
+            ) : (
+                isFarmer && inv.investmentStatus === "OPEN" && (
+                    <button
+                        className="w-full mt-2 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded-xl transition"
+                        onClick={() => onApplication && onApplication(inv.investmentNumber)}
+                    >
+                        {t('investments.submitApplication')}
+                    </button>
+                )
             )}
-            {isFarmer && isOwner && (
+            {isFarmer && !isOwner && inv.investmentStatus === "IN_WORK" && winnerApplication?.farmerId == userInfo.accountsDto.accountNumber && (
                 <button
                     className="w-full mt-2 border border-amber-400 text-amber-700 font-semibold py-2 rounded-xl hover:bg-amber-50 transition"
                     onClick={() => onDividends && onDividends(inv.investmentNumber)}
@@ -75,11 +103,6 @@ const InvestmentCard = ({
                     {t('investments.payDividends')}
                 </button>
             )}
-            {/*{isFarmer &&  === "APPLIED" && (*/}
-            {/*    <div className="text-green-500 font-semibold">*/}
-            {/*        {t('investments.applied')}*/}
-            {/*    </div>*/}
-            {/*)}*/}
             {isInvestor && isOwner && (
                 <button
                     className="w-full mt-2 border border-blue-400 text-green-700 font-semibold py-2 rounded-xl hover:bg-green-800 transition"
@@ -96,7 +119,7 @@ const InvestmentsPage = () => {
     const { t } = useTranslation();
     const dispatch = useAppDispatch();
     const { userInfo, isLoading, error } = useAppSelector((state) => state.reducer.user);
-    const { investmentLots } = useAppSelector((state) => state.reducer.investment);
+    const { investmentLots, selectedInvestmentLot, selectedInvestmentApplication } = useAppSelector((state) => state.reducer.investment);
 
     const [openInvestmentLotForm, setOpenInvestmentLotForm] = useState(false);
     const [openApplyForInvestmentLotForm, setOpenApplyForInvestmentLotForm] = useState(false);
@@ -130,7 +153,7 @@ const InvestmentsPage = () => {
     useEffect(() => {
         const mobileNumber = keycloak.tokenParsed?.mobile_number;
         if (mobileNumber) dispatch(fetchUserDetails(mobileNumber));
-    }, [dispatch]);
+    }, [dispatch, keycloak.token]);
 
     useEffect(() => {
         if ((isInvestor && myAccount) || isFarmer) {
@@ -151,6 +174,19 @@ const InvestmentsPage = () => {
     };
 
     const handleDividends = (investmentNumber: number) => {
+        dispatch(fetchInvestmentApplication({investmentNumber, accountNumber: myAccount!}))
+        dispatch(fetchInvestment(investmentNumber));
+        // @ts-ignore
+        dispatch(updateInvestmentLot({
+            ...selectedInvestmentLot,
+            investmentStatus: "CLOSED"
+        }));
+
+        // @ts-ignore
+        dispatch(updateInvestmentApplication({
+            ...selectedInvestmentApplication,
+            applicationStatus: "COMPLETED"
+        }));
         alert(t('investments.dividendsInitiated', { number: investmentNumber }));
     };
 

@@ -6,7 +6,7 @@ WORKDIR /app
 RUN apk add --no-cache python3 make g++ linux-headers eudev-dev
 
 COPY package*.json ./
-RUN npm install
+RUN npm install --force
 COPY . .
 EXPOSE 3000
 CMD ["npm", "start"]

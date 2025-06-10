@@ -9,7 +9,7 @@ services:
       - "50051:50051"
     environment:
       - SERVER_PORT=50051
-      - SERVER_BASE_URL=http://localhost:9080
+      - SERVER_BASE_URL=http://localhost:8080
       - MONGODB_URI=mongodb://mongo:27017
       - MONGODB_DATABASE=payment_api
       - PAYPAL_CLIENT_ID=${PAYPAL_CLIENT_ID}
@@ -18,7 +18,7 @@ services:
       - SOLANA_ENDPOINT=https://api.devnet.solana.com
       - SOLANA_PRIVATE_KEY=${SOLANA_PRIVATE_KEY}
       - SOLANA_PROGRAM_ID=${SOLANA_PROGRAM_ID}
-      - TS_SERVER_URL=http://ts-api:8083
+      - TS_SERVER_URL=http://ts-api:8081
       - TS_CLIENT_PRIVATE_KEY=${SOLANA_PROGRAM_ID}
       - TS_CLIENT_TIMEOUT_SEC=10
     depends_on:
@@ -31,9 +31,10 @@ services:
       context: ./ts-api
       dockerfile: Dockerfile
     ports:
-      - "8083:8083"
+      - "8081:8081"
     environment:
       - NODE_ENV=production
+      - MONGODB_URI=mongodb://mongo:27017
     restart: unless-stopped
 
   mongo:

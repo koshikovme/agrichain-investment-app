@@ -141,6 +141,14 @@
     "terms": "Условия использования"
   },
   "investments": {
+    "dividendsInitiated": "Выплата дивидендов инициирована!",
+    "paymentSuccessSolana",: "Платёж успешно выполнен через Solana Pay",
+    "thankYou": "Спасибо за ваш интерес к инвестициям в агросектор!",
+    "backToMain": "Вернуться на главную",
+    "paymentId": "ID платежа",
+    "paymentSuccess": "Платёж успешно выполнен",
+    "paymentExecuted": "Оплата выполнена",
+    "farmerChosen": "Фермер выбран",
     "applicationsForLot": "Заявки на лот №{{number}}",
     "actions": "Действия",
     "accept": "Принять",
@@ -195,7 +203,9 @@
     "investmentDynamics": "Динамика инвестиций"
   },
   "achievements": {
-    "title": "Достижения",
+    "firstClosedLot": "Первый завершённый лот",
+    "firstClosedLotDesc": "Вы успешно завершили первый инвестиционный лот",
+    "title",: "Достижения",
     "noAchievements": "Пока нет достижений",
     "getFirstAchievement": "Совершите первую инвестицию, чтобы получить достижение!",
     "firstInvestor": "Первый инвестор ⭐",
@@ -206,6 +216,8 @@
     "professionalInvestorDesc": "10+ инвестиций"
   },
   "admin": {
+    "viewApplications": "Просмотреть заявки",
+    "applications": "Заявки на лоты",
     "noApplications": "Нет заявок на лоты",
     "applicationsForLot": "Заявки на лот №{{number}}",
     "farmerId": "ID фермера",

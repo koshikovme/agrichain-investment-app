@@ -67,10 +67,10 @@ func (c *PayPalClient) CreatePayment(ctx context.Context, amount float64, curren
 		PaymentMethod: paypal.PaymentMethod{
 			PayeePreferred:         paypal.PayeePreferredUnrestricted,
 			StandardEntryClassCode: paypal.StandardEntryClassCodeTel,
-		},
+		},	
 		LandingPage: "NO_PREFERENCE",
-		ReturnURL:   returnURL, // Use parameter instead of hardcoded value
-		CancelURL:   cancelURL, // Use parameter instead of hardcoded value
+		ReturnURL:   "http://localhost:3000/payment-success", // Use parameter instead of hardcoded value
+		CancelURL:   "http://localhost:3000",                 // Use parameter instead of hardcoded value
 	}
 
 	order, err := c.client.CreateOrder(ctx, paypal.OrderIntentCapture, []paypal.PurchaseUnitRequest{unit}, nil, &appContext)
@@ -78,7 +78,7 @@ func (c *PayPalClient) CreatePayment(ctx context.Context, amount float64, curren
 		return "", "", fmt.Errorf("failed to create payment: %w", err)
 	}
 
-	if order.ID == "" {
+	if order.ID == "" {	
 		return "", "", fmt.Errorf("payment creation succeeded but no payment ID returned")
 	}
 

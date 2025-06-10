@@ -736,12 +736,13 @@ const PersonalInformationPanel: FC = () => {
                                             <TableCell>{t('investments.amount')}</TableCell>
                                             <TableCell>{t('investments.description')}</TableCell>
                                             <TableCell>{t('admin.actions')}</TableCell>
+                                            <TableCell>{t('admin.applications')}</TableCell>
+                                            {/* <TableCell>{t('investments.createdAt')}</TableCell> */}
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
                                         {investmentLots.map((lot) => (
                                             <TableRow key={lot.investmentNumber} 
-                                                onClick={() => handleOpenApplications(lot.investmentNumber)} 
                                                 sx={{
                                                     cursor: "pointer",
                                                     "&:hover": { 
@@ -785,6 +786,26 @@ const PersonalInformationPanel: FC = () => {
                                                             {t('admin.confirm')}
                                                         </Button>
                                                     )}
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Button
+                                                        variant="outlined"
+                                                        size="small"
+                                                        onClick={() => {
+                                                            setSelectedLotId(lot.investmentNumber);
+                                                            setOpenApplicationsModal(true);
+                                                        }}
+                                                        sx={{
+                                                            color: "#4caf50",
+                                                            borderColor: "#4caf50",
+                                                            "&:hover": {
+                                                                backgroundColor: "rgba(76, 175, 80, 0.1)",
+                                                                borderColor: "#388e3c"
+                                                            }
+                                                        }}
+                                                    >
+                                                        {t('admin.viewApplications')}
+                                                    </Button>
                                                 </TableCell>
                                                 {/* <TableCell>{lot.createdAt}</TableCell> */}
                                                 <InvestmentApplicationsModal

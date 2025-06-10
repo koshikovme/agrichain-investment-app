@@ -2,8 +2,8 @@ import {PaymentResponseDto} from "../payment/paymentTypes";
 
 export type InvestmentType = 'CATTLE' | 'LAND' | 'EQUIPMENT' | 'CASH'; // уточни по enum backend
 export type ConfirmationType = 'PAYMENT' | 'CHECK' | 'ESCROW' | 'NFT';
-export type InvestmentLotStatus = 'OPEN' | 'UNDER_REVIEW' | 'CLOSED' | 'REJECTED';
-export type ApplicationStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'CANCELLED' | 'EXPIRED';
+export type InvestmentLotStatus = 'OPEN' | 'UNDER_REVIEW' | 'CLOSED' | 'REJECTED' | 'IN_WORK';
+export type ApplicationStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'CANCELLED' | 'EXPIRED' | 'COMPLETED';
 
 export interface InvestmentLotsDto {
     investmentNumber: number;

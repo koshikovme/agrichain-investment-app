@@ -1,10 +1,11 @@
-// frontend/src/components/profile/AchievementPanel.tsx
 import React from "react";
 import { Box, Typography, Chip, Card, CardContent } from "@mui/material";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import StarIcon from "@mui/icons-material/Star";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useTranslation } from "react-i18next";
+import { useAppSelector } from "../../app/hooks";
 
 interface AchievementPanelProps {
     investmentsCount: number;
@@ -12,10 +13,26 @@ interface AchievementPanelProps {
 
 const AchievementPanel: React.FC<AchievementPanelProps> = ({ investmentsCount }) => {
     const { t } = useTranslation();
-    
+    const { investmentLots } = useAppSelector((state) => state.reducer.investment);
+    const { userInfo } = useAppSelector((state) => state.reducer.user);
+
+    // Проверяем, есть ли у пользователя хотя бы один закрытый лот
+    const hasClosedLot = investmentLots.some(
+        lot => lot.accountNumber === userInfo.accountsDto.accountNumber && lot.investmentStatus === "CLOSED"
+    );
+
     const getAchievements = () => {
         const achievements = [];
-        
+
+        if (hasClosedLot) {
+            achievements.push({
+                icon: <CheckCircleIcon sx={{ color: "#4caf50" }} />,
+                label: t('achievements.firstClosedLot'),
+                description: t('achievements.firstClosedLotDesc'),
+                color: "success" as const
+            });
+        }
+
         if (investmentsCount >= 1) {
             achievements.push({
                 icon: <StarIcon sx={{ color: "#ffc107" }} />,
@@ -24,7 +41,7 @@ const AchievementPanel: React.FC<AchievementPanelProps> = ({ investmentsCount })
                 color: "warning" as const
             });
         }
-        
+
         if (investmentsCount >= 5) {
             achievements.push({
                 icon: <EmojiEventsIcon sx={{ color: "#ff9800" }} />,
@@ -33,7 +50,7 @@ const AchievementPanel: React.FC<AchievementPanelProps> = ({ investmentsCount })
                 color: "warning" as const
             });
         }
-        
+
         if (investmentsCount >= 10) {
             achievements.push({
                 icon: <TrendingUpIcon sx={{ color: "#4caf50" }} />,
@@ -42,7 +59,7 @@ const AchievementPanel: React.FC<AchievementPanelProps> = ({ investmentsCount })
                 color: "success" as const
             });
         }
-        
+
         return achievements;
     };
 
@@ -90,9 +107,9 @@ const AchievementPanel: React.FC<AchievementPanelProps> = ({ investmentsCount })
                                         </Box>
                                     }
                                     color={achievement.color}
-                                    sx={{ 
-                                        fontWeight: 600, 
-                                        fontSize: "1rem", 
+                                    sx={{
+                                        fontWeight: 600,
+                                        fontSize: "1rem",
                                         py: 3,
                                         px: 2,
                                         borderRadius: 4,
@@ -109,7 +126,7 @@ const AchievementPanel: React.FC<AchievementPanelProps> = ({ investmentsCount })
                             ))}
                         </Box>
                     ) : (
-                        <Box 
+                        <Box
                             sx={{
                                 textAlign: "center",
                                 py: 4,

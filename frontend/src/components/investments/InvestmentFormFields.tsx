@@ -5,7 +5,7 @@ import { useTheme } from '@mui/material/styles';
 
 interface Props {
     form: any;
-    onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
     onSelectChange: (e: any) => void;
 }
 
@@ -16,12 +16,13 @@ const investmentTypeLabels: Record<InvestmentType, string> = {
     EQUIPMENT: 'Оборудование',
     CASH: 'Денежные средства',
 };
-const investmentStatuses: InvestmentLotStatus[] = ['OPEN', 'UNDER_REVIEW', 'CLOSED', 'REJECTED'];
+const investmentStatuses: InvestmentLotStatus[] = ['OPEN', 'UNDER_REVIEW', 'CLOSED', 'REJECTED', 'IN_WORK'];
 const statusLabels: Record<InvestmentLotStatus, string> = {
     OPEN: 'Открыт',
     UNDER_REVIEW: 'На рассмотрении',
     CLOSED: 'Закрыт',
     REJECTED: 'Отклонён',
+    IN_WORK: 'В работе',
 };
 
 const appleFont = `"SF Pro Display","SF Pro Icons","Helvetica Neue","Helvetica","Arial",sans-serif`;
@@ -56,11 +57,11 @@ const InvestmentFormFields: React.FC<Props> = ({ form, onInputChange, onSelectCh
             <TextField
                 label="Сумма (USD)"
                 name="sum"
-                type="number"
+                // type="number" // убираем, чтобы не было автоприведения
                 value={form.sum}
                 onChange={onInputChange}
                 fullWidth
-                inputProps={{ min: 0 }}
+                inputProps={{ inputMode: 'numeric', pattern: '[0-9]*', min: 0 }}
                 sx={{ fontFamily: appleFont }}
             />
             <TextField

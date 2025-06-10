@@ -156,6 +156,14 @@
     "professionalInvestorDesc": "10+ инвестиция"
   },
   "investments": {
+    "dividendsInitiated": "Дивиденд төлеу басталды!",
+    "paymentSuccessSolana",: "Төлем сәтті орындалды! Сіздің инвестицияңыз қабылданды.",
+    "thankYou": "Рақмет! Сіздің инвестицияңыз қабылданды.",
+    "backToMain": "Негізгі бетке оралу",
+    "paymentId": "Төлем ID",
+    "paymentSuccess": "Төлем сәтті орындалды",
+    "paymentExecuted": "Төлем орындалды",
+    "farmerChosen": "Фермер таңдалды",
     "applicationsForLot": "№{{number}} лотқа өтінімдер",
     "actions": "Әрекеттер",
     "accept": "Қабылдау",
@@ -210,6 +218,8 @@
     "noUserData": "Пайдаланушы деректері табылмады."
   },
   "admin": {
+    "viewApplications": "Өтінімдерді қарау",
+    "applications": "Өтінімдер",
     "noApplications": "Инвестициялық лоттарға өтінімдер жоқ",
     "investmentLots": "Инвестициялық лоттар",
     "allInvestmentLots": "Барлық инвестициялық лоттар",

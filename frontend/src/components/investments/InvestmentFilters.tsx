@@ -54,6 +54,7 @@ export const InvestmentFiltersComponent = ({ filters, setFilters, onReset }: {
                 <option value="UNDER_REVIEW">🟡 На рассмотрении</option>
                 <option value="CLOSED">🔴 Закрыт</option>
                 <option value="REJECTED">⚪ Отклонён</option>
+                <option value="IN_WORK">🟣 В работе</option>
             </select>
         </div>
         <div className="flex flex-col w-full sm:w-auto">

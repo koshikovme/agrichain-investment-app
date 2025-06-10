@@ -30,8 +30,8 @@ func main() {
 		Amount:      99.99,
 		Currency:    "USD",
 		Description: "Test payment",
-		ReturnUrl:   "http://localhost:8090/success",
-		CancelUrl:   "http://localhost:8090/cancel",
+		ReturnUrl:   "http://localhost:8080/success",
+		CancelUrl:   "http://localhost:8080/cancel",
 		Metadata: map[string]string{
 			"customer_id": "123456",
 			"order_id":    "ORD-123",

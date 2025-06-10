@@ -1,11 +1,14 @@
-// frontend/src/components/investments/InvestmentApplicationsModal.tsx
-import React, {useState} from "react";
-import { Modal, Box, Typography, Table, TableHead, TableRow, TableCell, TableBody } from "@mui/material";
+import React, { useState } from "react";
+import { Modal, Box, Typography, Table, TableHead, TableRow, TableCell, TableBody, RadioGroup, FormControlLabel, Radio, Button } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { InvestmentApplicationDto } from "../../features/investment/investmentTypes";
-import {useAppDispatch, useAppSelector} from "../../app/hooks";
-import {updateInvestmentApplication} from "../../features/investment/investmentsSlice";
-import {createPaymentForInvestment, executePaymentForInvestment} from "../../features/payment/paymentsSlice";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import {
+    fetchAllInvestments, fetchInvestment,
+    updateInvestmentApplication, updateInvestmentLot
+} from "../../features/investment/investmentsSlice";
+import { createPaymentForInvestment } from "../../features/payment/paymentsSlice";
+import QR from "../../features/solana/QR"; // Импортируйте ваш компонент QR
 
 interface InvestmentApplicationsModalProps {
     open: boolean;
@@ -14,81 +17,57 @@ interface InvestmentApplicationsModalProps {
     selectedLotId: number | null;
 }
 
-
 const InvestmentApplicationsModal: React.FC<InvestmentApplicationsModalProps> = ({
-                                                                                     open,
-                                                                                     onClose,
-                                                                                     applications,
-                                                                                     selectedLotId,
-                                                                                 }) => {
+    open,
+    onClose,
+    applications,
+    selectedLotId,
+}) => {
     const { t } = useTranslation();
     const dispatch = useAppDispatch();
-    const {paymentResponse} = useAppSelector((state) => state.reducer.payment);
+    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<"paypal" | "solana">("paypal");
+    const [showQR, setShowQR] = useState(false);
+    const [currentApplication, setCurrentApplication] = useState<InvestmentApplicationDto | null>(null);
+
+    const [paymentStarted, setPaymentStarted] = useState(false);
+
+    const {selectedInvestmentLot} = useAppSelector((state) => state.reducer.investment);
 
     const handleAcceptApplication = async (application: InvestmentApplicationDto) => {
-        try {
-            // Обновляем статус заявки на ACCEPTED
-            await dispatch(
-                updateInvestmentApplication({
-                    ...application,
-                    applicationStatus: "ACCEPTED",
-                })
-            ).unwrap();
-
-            alert(t("investments.applicationAccepted"));
-        } catch (error) {
-            console.error(t("investments.errorUpdatingApplication"), error);
-        }
+        await dispatch(updateInvestmentApplication({
+            ...application,
+            applicationStatus: "ACCEPTED"
+        })).unwrap();
+        await dispatch(fetchAllInvestments());
+        onClose();
     };
 
-    const handlePayInvestmentCreation = async (application: InvestmentApplicationDto) => {
-        try {
-            // Создаем запрос на создание платежа
-            const paymentRequest = {
-                walletId: application.farmerId,
-                investmentNumber: application.lotId,
-                accountNumber: application.farmerId,
-                currency: "USD",
-                mobileNumber: "1234567890", // Замените на реальный номер
-                paymentResponseDto: null,
-            };
-
-            const paymentResponse = await dispatch(createPaymentForInvestment(paymentRequest)).unwrap();
-
-            if (paymentResponse.paypalUrl) {
-                // Перенаправляем пользователя на PayPal URL
-                window.location.href = paymentResponse.paypalUrl;
-            } else {
+    const handlePay = async (application: InvestmentApplicationDto) => {
+        setCurrentApplication(application);
+        if (selectedPaymentMethod === "paypal") {
+            try {
+                const paymentRequest = {
+                    walletId: application.farmerId,
+                    investmentNumber: application.lotId,
+                    accountNumber: application.farmerId,
+                    currency: "USD",
+                    mobileNumber: "1234567890",
+                    paymentResponseDto: null,
+                };
+                const paymentResponse = await dispatch(createPaymentForInvestment(paymentRequest)).unwrap();
+                if (paymentResponse.paypalUrl) {
+                    dispatch(fetchInvestment(application.lotId));
+                    // @ts-ignore
+                    dispatch(updateInvestmentLot({...selectedInvestmentLot, investmentStatus: "IN_WORK"}));
+                    window.location.href = paymentResponse.paypalUrl;
+                } else {
+                    alert(t("investments.errorCreatingPayment"));
+                }
+            } catch (error) {
                 alert(t("investments.errorCreatingPayment"));
             }
-        } catch (error) {
-            console.error(t("investments.errorCreatingPayment"), error);
-        }
-    };
-
-    const handlePayInvestmentExecution = async (application: InvestmentApplicationDto) => {
-        try {
-            // Создаем платеж для фермера
-            const paymentRequest = {
-                walletId: application.farmerId,
-                investmentNumber: application.lotId,
-                accountNumber: application.farmerId,
-                currency: "USD",
-                mobileNumber: "1234567890", // Замените на реальный номер
-                paymentResponseDto: paymentResponse,
-            };
-
-            const response = await dispatch(
-                executePaymentForInvestment(paymentRequest)
-            ).unwrap();
-
-            alert(
-                t("investments.paymentInitiated", {
-                    url: response.paypalUrl || "N/A",
-                })
-            );
-        } catch (error) {
-            console.error(t("investments.errorCreatingPayment"), error);
+        } else if (selectedPaymentMethod === "solana") {
+            setShowQR(true);
         }
     };
 
@@ -115,20 +94,33 @@ const InvestmentApplicationsModal: React.FC<InvestmentApplicationsModalProps> = 
                                 <TableCell>{application.applicationStatus}</TableCell>
                                 <TableCell>
                                     {application.applicationStatus === "PENDING" && (
-                                        <button
-                                            onClick={() => handleAcceptApplication(application)}
-                                            className="bg-green-500 text-white px-4 py-2 rounded"
-                                        >
-                                            {t("investments.accept")}
-                                        </button>
-                                    )}
-                                    {application.applicationStatus === "ACCEPTED" && (
-                                        <button
-                                            onClick={() => handlePayInvestmentCreation(application)}
-                                            className="bg-blue-500 text-white px-4 py-2 rounded"
-                                        >
-                                            {t("investments.pay")}
-                                        </button>
+                                        <Box>
+                                            {!paymentStarted && (
+                                                <RadioGroup
+                                                    row
+                                                    value={selectedPaymentMethod}
+                                                    onChange={e => setSelectedPaymentMethod(e.target.value as "paypal" | "solana")}
+                                                >
+                                                    <FormControlLabel value="paypal" control={<Radio />} label="PayPal" />
+                                                    <FormControlLabel value="solana" control={<Radio />} label="Solana" />
+                                                </RadioGroup>
+                                            )}
+                                            <Button
+                                                onClick={() => handlePay(application)}
+                                                variant="contained"
+                                                color="primary"
+                                                size="small"
+                                                sx={{ mt: 1 }}
+                                                disabled={paymentStarted}
+                                            >
+                                                {t("investments.pay")}
+                                            </Button>
+                                            {showQR && selectedPaymentMethod === "solana" && currentApplication?.farmerId === application.farmerId && (
+                                                <Box mt={2}>
+                                                    <QR width={140} height={140} />
+                                                </Box>
+                                            )}
+                                        </Box>
                                     )}
                                 </TableCell>
                             </TableRow>

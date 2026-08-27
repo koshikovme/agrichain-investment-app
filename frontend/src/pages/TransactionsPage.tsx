@@ -1,13 +1,19 @@
 import React, { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { fetchPayments } from "../features/payment/paymentsSlice";
+import { PaymentsDto } from "../features/payment/paymentTypes";
 import { Box, Typography, Card, CardContent, Grid } from "@mui/material";
 import { useTranslation } from "react-i18next";
 
 const appleFont = `"SF Pro Display","SF Pro Icons","Helvetica Neue","Helvetica","Arial",sans-serif`;
 
-const PaymentCard = ({ payment }: { payment: any }) => {
+type PaymentCardProps = {
+    payment: PaymentsDto;
+};
+
+const PaymentCard = ({ payment }: PaymentCardProps) => {
     const { t } = useTranslation();
+
     return (
         <Card
             variant="outlined"

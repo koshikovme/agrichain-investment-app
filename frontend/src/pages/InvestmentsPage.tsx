@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import {
     Card,
@@ -14,16 +14,24 @@ import {
 } from "@mui/material";
 import { keycloak } from "../features/auth/keycloak";
 import { fetchUserDetails } from "../features/user/userSlice";
-import { fetchAllInvestments, fetchInvestments, investInLot } from "../features/investment/investmentsSlice";
+import { fetchInvestments, investInLot } from "../features/investment/investmentsSlice";
+import { InvestmentsDto } from "../features/investment/investmentTypes";
 import CreateInvestmentForm from "../components/CreateInvestmentForm";
 import SolanaPayLinkGenerator from "../features/solana/SolanaPayLinkGenerator";
-import {useInvestmentsWebSocket} from "../features/investment/useInvestmentsWebSocket";
+import { useInvestmentsWebSocket } from "../features/investment/useInvestmentsWebSocket";
 import { useTranslation } from "react-i18next";
 
 const appleFont = `"SF Pro Display","SF Pro Icons","Helvetica Neue","Helvetica","Arial",sans-serif`;
 
-const InvestmentCard = ({ inv, onInvest }: { inv: any; onInvest?: (id: number) => void }) => {
+type InvestmentCardProps = {
+    inv: InvestmentsDto;
+    onInvest?: (id: number) => void;
+};
+
+const InvestmentCard = ({ inv, onInvest }: InvestmentCardProps) => {
     const { t } = useTranslation();
+    const isOpenForInvestment = inv.investmentStatus === "WAITING_FOR_INVESTMENTS";
+
     return (
         <Card
             variant="outlined"
@@ -51,7 +59,7 @@ const InvestmentCard = ({ inv, onInvest }: { inv: any; onInvest?: (id: number) =
                 <Typography variant="body2" mt={1}>
                     {inv.description}
                 </Typography>
-                {onInvest && inv.investmentStatus === "WAITING_FOR_INVESTMENTS" ? (
+                {onInvest && isOpenForInvestment ? (
                     <Button
                         fullWidth
                         variant="contained"
@@ -60,7 +68,7 @@ const InvestmentCard = ({ inv, onInvest }: { inv: any; onInvest?: (id: number) =
                     >
                         {t('investments.invest')}
                     </Button>
-                ) : !onInvest && inv.investmentStatus === "WAITING_FOR_INVESTMENTS" ? null : (
+                ) : !onInvest && isOpenForInvestment ? null : (
                     <Typography
                         variant="subtitle1"
                         sx={{ mt: 2, fontWeight: "bold", color: "gray", fontFamily: appleFont }}
@@ -80,10 +88,12 @@ const InvestmentsPage = () => {
     const { userInfo, isLoading, error } = useAppSelector((state) => state.reducer.user);
     const { isAuthenticated } = useAppSelector((state) => state.reducer.auth);
     const { investments, paypalUrl } = useAppSelector((state) => state.reducer.investment);
+    const accountType = userInfo.accountsDto?.accountType;
+    const accountNumber = userInfo.accountsDto?.accountNumber;
 
-    const [open, setOpen] = useState(false);
+    const [isPaymentDialogOpen, setIsPaymentDialogOpen] = useState(false);
     const [selectedInvestment, setSelectedInvestment] = useState<number | null>(null);
-    const [showSolana, setShowSolana] = useState(false);
+    const [showSolanaPayment, setShowSolanaPayment] = useState(false);
 
     useEffect(() => {
         const mobileNumber = keycloak.tokenParsed?.mobile_number;
@@ -91,12 +101,10 @@ const InvestmentsPage = () => {
     }, [dispatch, isAuthenticated]);
 
     useEffect(() => {
-        if (userInfo.accountsDto?.accountType === "INVESTORS") {
-            // dispatch(fetchAllInvestments());
-        } else if (userInfo.accountsDto?.accountType === "FARMERS" && userInfo.accountsDto?.accountNumber) {
-            dispatch(fetchInvestments(userInfo.accountsDto.accountNumber));
+        if (accountType === "FARMERS" && accountNumber) {
+            dispatch(fetchInvestments(accountNumber));
         }
-    }, [dispatch, userInfo.accountsDto?.accountNumber, userInfo.accountsDto?.accountType]);
+    }, [accountNumber, accountType, dispatch]);
 
     useEffect(() => {
         if (paypalUrl) window.location.href = paypalUrl;
@@ -104,28 +112,29 @@ const InvestmentsPage = () => {
 
     const handleInvestClick = (investmentNumber: number) => {
         setSelectedInvestment(investmentNumber);
-        setOpen(true);
-        setShowSolana(false);
+        setIsPaymentDialogOpen(true);
+        setShowSolanaPayment(false);
     };
 
     const handlePayPal = async () => {
-        if (!userInfo.accountsDto?.accountNumber || selectedInvestment == null) return;
+        if (!accountNumber || selectedInvestment == null) return;
+
         await dispatch(
             investInLot({
                 walletId: 123,
                 investmentNumber: selectedInvestment,
                 currency: "USD",
-                accountNumber: userInfo.accountsDto.accountNumber,
+                accountNumber,
                 mobileNumber: userInfo.mobileNumber,
             })
         );
-        setOpen(false);
+        setIsPaymentDialogOpen(false);
     };
 
     if (isLoading) return <Typography>{t('common.loading')}</Typography>;
     if (error) return <Typography color="error">{error}</Typography>;
 
-    if (userInfo.accountsDto?.accountType === "INVESTORS") {
+    if (accountType === "INVESTORS") {
         return (
             <Box sx={{ p: 3, fontFamily: appleFont }}>
                 <Typography
@@ -151,10 +160,15 @@ const InvestmentsPage = () => {
                 )}
 
                 {/* Модальное окно выбора способа оплаты */}
-                <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
+                <Dialog
+                    open={isPaymentDialogOpen}
+                    onClose={() => setIsPaymentDialogOpen(false)}
+                    maxWidth="sm"
+                    fullWidth
+                >
                     <DialogTitle>{t('investments.choosePayment')}</DialogTitle>
                     <DialogContent>
-                        {!showSolana ? (
+                        {!showSolanaPayment ? (
                             <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}>
                                 <Button
                                     variant="contained"
@@ -167,7 +181,7 @@ const InvestmentsPage = () => {
                                 <Button
                                     variant="outlined"
                                     color="success"
-                                    onClick={() => setShowSolana(true)}
+                                    onClick={() => setShowSolanaPayment(true)}
                                     sx={{ borderRadius: 2, fontWeight: 600 }}
                                 >
                                     Solana Pay
@@ -180,14 +194,14 @@ const InvestmentsPage = () => {
                         )}
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={() => setOpen(false)}>{t('common.close')}</Button>
+                        <Button onClick={() => setIsPaymentDialogOpen(false)}>{t('common.close')}</Button>
                     </DialogActions>
                 </Dialog>
             </Box>
         );
     }
 
-    if (userInfo.accountsDto?.accountType === "FARMERS") {
+    if (accountType === "FARMERS") {
         return (
             <Box sx={{ p: 3, fontFamily: appleFont }}>
                 <CreateInvestmentForm />

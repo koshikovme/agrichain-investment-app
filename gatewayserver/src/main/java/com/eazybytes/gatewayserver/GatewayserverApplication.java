@@ -20,38 +20,6 @@ public class GatewayserverApplication {
 		SpringApplication.run(GatewayserverApplication.class, args);
 	}
 
-//	@Bean
-//	public RouteLocator agriChainRouteConfig(RouteLocatorBuilder builder) {
-//		return builder.routes()
-//				.route(
-//					p  -> p
-//						.path("/agrichain/users/**")
-//						.filters(f -> f
-//								.preserveHostHeader()
-//								.rewritePath("/agrichain/users/(?<segment>.*)", "/api/${segment}")
-//								.addResponseHeader("X-Response-Time", LocalDateTime.now().toString())
-////								.circuitBreaker(config ->
-////										config.setName("accountsCircuitBreaker")
-////										.setFallbackUri("forward:/contactSupport")
-////								)
-//						)
-//						.uri("lb://USERS")
-//				)
-//				.route(
-//						p  -> p
-//								.path("/agrichain/investments/**")
-//								.filters(f -> f
-//										.rewritePath("/agrichain/investments/(?<segment>.*)", "/api/${segment}")
-//										.addResponseHeader("X-Response-Time", LocalDateTime.now().toString())
-////										.requestRateLimiter(config -> config
-////												.setRateLimiter(redisRateLimiter())
-////												.setKeyResolver(userKeyResolver()))
-//								)
-//								.uri("lb://INVESTMENTS")
-//				)
-//				.build();
-//	}
-
 	@Bean
 	public RouteLocator agriChainRouteConfig(RouteLocatorBuilder builder) {
 		return builder.routes()

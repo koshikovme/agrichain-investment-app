@@ -19,9 +19,8 @@ import { InvestmentsDto } from "../features/investment/investmentTypes";
 import CreateInvestmentForm from "../components/CreateInvestmentForm";
 import SolanaPayLinkGenerator from "../features/solana/SolanaPayLinkGenerator";
 import { useInvestmentsWebSocket } from "../features/investment/useInvestmentsWebSocket";
+import { appleFont, centeredPageTitleSx, dialogMethodButtonSx, pageContainerSx } from "../constants/ui";
 import { useTranslation } from "react-i18next";
-
-const appleFont = `"SF Pro Display","SF Pro Icons","Helvetica Neue","Helvetica","Arial",sans-serif`;
 
 type InvestmentCardProps = {
     inv: InvestmentsDto;
@@ -136,12 +135,12 @@ const InvestmentsPage = () => {
 
     if (accountType === "INVESTORS") {
         return (
-            <Box sx={{ p: 3, fontFamily: appleFont }}>
+            <Box sx={pageContainerSx}>
                 <Typography
                     variant="h4"
                     gutterBottom
                     align="center"
-                    sx={{ fontFamily: appleFont, fontWeight: 700, mb: 4 }}
+                    sx={centeredPageTitleSx}
                 >
                     {t('investments.availableLots')}
                 </Typography>
@@ -174,7 +173,7 @@ const InvestmentsPage = () => {
                                     variant="contained"
                                     color="primary"
                                     onClick={handlePayPal}
-                                    sx={{ borderRadius: 2, fontWeight: 600 }}
+                                    sx={dialogMethodButtonSx}
                                 >
                                     PayPal
                                 </Button>
@@ -182,7 +181,7 @@ const InvestmentsPage = () => {
                                     variant="outlined"
                                     color="success"
                                     onClick={() => setShowSolanaPayment(true)}
-                                    sx={{ borderRadius: 2, fontWeight: 600 }}
+                                    sx={dialogMethodButtonSx}
                                 >
                                     Solana Pay
                                 </Button>
@@ -203,13 +202,13 @@ const InvestmentsPage = () => {
 
     if (accountType === "FARMERS") {
         return (
-            <Box sx={{ p: 3, fontFamily: appleFont }}>
+            <Box sx={pageContainerSx}>
                 <CreateInvestmentForm />
                 <Typography
                     variant="h4"
                     gutterBottom
                     align="center"
-                    sx={{ fontFamily: appleFont, fontWeight: 700, mb: 4, mt: 2 }}
+                    sx={{ ...centeredPageTitleSx, mt: 2 }}
                 >
                     {t('investments.yourLots')}
                 </Typography>

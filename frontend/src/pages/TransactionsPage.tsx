@@ -3,9 +3,8 @@ import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { fetchPayments } from "../features/payment/paymentsSlice";
 import { PaymentsDto } from "../features/payment/paymentTypes";
 import { Box, Typography, Card, CardContent, Grid } from "@mui/material";
+import { appleFont, centeredPageTitleSx, pageContainerSx } from "../constants/ui";
 import { useTranslation } from "react-i18next";
-
-const appleFont = `"SF Pro Display","SF Pro Icons","Helvetica Neue","Helvetica","Arial",sans-serif`;
 
 type PaymentCardProps = {
     payment: PaymentsDto;
@@ -54,12 +53,12 @@ const TransactionsPage = () => {
     }, [dispatch, isAuthenticated]);
 
     return (
-        <Box sx={{ p: 3, fontFamily: appleFont }}>
+        <Box sx={pageContainerSx}>
             <Typography
                 variant="h4"
                 align="center"
                 gutterBottom
-                sx={{ fontFamily: appleFont, fontWeight: 700, mb: 4 }}
+                sx={centeredPageTitleSx}
             >
                 {t('transactions.title')}
             </Typography>
